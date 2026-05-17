@@ -361,9 +361,8 @@ export default function TechnicianDashboardPage() {
                   handleAcceptRequest(selectedRequest.id);
                   setSelectedRequest(null);
                 }}
-                disabled={isAccepting[selectedRequest.id]}
-                className="flex-1 py-3 text-sm font-semibold bg-secondary-container text-on-secondary-container rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-secondary-container/20 disabled:opacity-50">
-                {isAccepting[selectedRequest.id] ? 'Opening...' : 'Send Quote'}
+                className="flex-1 py-3 text-sm font-semibold bg-secondary-container text-on-secondary-container rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-secondary-container/20">
+                Send Quote
               </button>
             </div>
           </div>
