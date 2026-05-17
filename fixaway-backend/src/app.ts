@@ -19,6 +19,8 @@ import chatRoutes from './routes/chat.routes';
 import walletRoutes from './routes/wallet.routes';
 import adminRoutes from './routes/admin.routes';
 import uploadRoutes from './routes/upload.routes';
+import notificationRoutes from './routes/notification.routes';
+import reviewRoutes from './routes/review.routes';
 import { errorHandler, notFound } from './middleware/error.middleware';
 import { initSocket } from './socket/socket';
 
@@ -58,6 +60,8 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // 404 + Error handlers
 app.use(notFound);

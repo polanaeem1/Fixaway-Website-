@@ -3,10 +3,12 @@ import { useState } from 'react';
 import { useAuthStore } from '@/store/auth.store';
 import { useRouter } from 'next/navigation';
 import { authApi } from '@/lib/api';
+import { useToast } from '@/components/ui/ToastProvider';
 
 export default function CustomerProfilePage() {
   const { user, accessToken, setAuth, clearAuth } = useAuthStore();
   const router = useRouter();
+  const { showToast } = useToast();
   
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -28,10 +30,10 @@ export default function CustomerProfilePage() {
       const { data } = await authApi.updateProfile(accessToken, formData);
       setAuth(data, accessToken, useAuthStore.getState().refreshToken || '');
       setIsEditing(false);
-      setFormData(prev => ({ ...prev, password: '' })); // Clear password field
-      alert('Profile updated successfully!');
+      setFormData(prev => ({ ...prev, password: '' }));
+      showToast('✅ Profile updated successfully!', 'success');
     } catch (err: any) {
-      alert(err.message || 'Failed to update profile');
+      showToast(err.message || 'Failed to update profile', 'error');
     } finally {
       setIsSaving(false);
     }

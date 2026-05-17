@@ -216,4 +216,26 @@ export const uploadApi = {
   },
 };
 
+// ─── Notifications ───────────────────────────────────────────────────────────
+export const notificationsApi = {
+  getAll: (token: string) =>
+    request<{ success: boolean; data: { notifications: any[]; total: number; unreadCount: number } }>(
+      '/notifications', { token }
+    ),
+  markAllRead: (token: string) =>
+    request<{ success: boolean }>('/notifications/read-all', { method: 'PATCH', token }),
+  markOneRead: (token: string, id: string) =>
+    request<{ success: boolean }>(`/notifications/${id}/read`, { method: 'PATCH', token }),
+};
+
+// ─── Reviews ─────────────────────────────────────────────────────────────────
+export const reviewsApi = {
+  submit: (token: string, orderId: string, rating: number, comment: string) =>
+    request<{ success: boolean; data: any }>('/reviews', {
+      method: 'POST',
+      token,
+      body: JSON.stringify({ orderId, rating, comment }),
+    }),
+};
+
 export { ApiError };

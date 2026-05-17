@@ -16,12 +16,13 @@ export default function TechnicianDashboardPage() {
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
   const [requests, setRequests] = useState<any[]>([]);
   const [activeOrders, setActiveOrders] = useState<any[]>([]);
-  const [isAccepting, setIsAccepting] = useState<Record<string, boolean>>({});
   const [isCompleting, setIsCompleting] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
   const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
+  const [quoteModal, setQuoteModal] = useState<{ request: any; price: string; note: string } | null>(null);
+  const [isSubmittingQuote, setIsSubmittingQuote] = useState(false);
   const [earningsData, setEarningsData] = useState({
     barHeights: ['0%', '0%', '0%', '0%', '0%', '0%', '0%'],
     todayTotal: 0
@@ -99,17 +100,26 @@ export default function TechnicianDashboardPage() {
   };
 
   const handleAcceptRequest = async (requestId: string) => {
-    if (!accessToken) return;
-    setIsAccepting(prev => ({ ...prev, [requestId]: true }));
+    // Open quote modal instead of hardcoding price
+    const req = requests.find((r: any) => r.id === requestId);
+    if (req) setQuoteModal({ request: req, price: '', note: '' });
+  };
+
+  const handleSubmitQuote = async () => {
+    if (!accessToken || !quoteModal) return;
+    const price = parseFloat(quoteModal.price);
+    if (!price || price <= 0) { showToast('Please enter a valid price', 'error'); return; }
+    setIsSubmittingQuote(true);
     try {
-      await quotationsApi.send(accessToken, requestId, 500, 'I can fix this immediately.');
+      await quotationsApi.send(accessToken, quoteModal.request.id, price, quoteModal.note || 'I can fix this for you.');
       const res = await requestsApi.getNearby(accessToken, 30.0444, 31.2357);
       setRequests(res.data ?? []);
-      showToast('Quote sent (500 EGP)! Waiting for customer approval.', 'success');
+      showToast(`Quote of EGP ${price} sent! Waiting for customer approval.`, 'success');
+      setQuoteModal(null);
     } catch (err: any) {
       showToast(err.message || 'Failed to send quote', 'error');
     } finally {
-      setIsAccepting(prev => ({ ...prev, [requestId]: false }));
+      setIsSubmittingQuote(false);
     }
   };
 
@@ -353,7 +363,63 @@ export default function TechnicianDashboardPage() {
                 }}
                 disabled={isAccepting[selectedRequest.id]}
                 className="flex-1 py-3 text-sm font-semibold bg-secondary-container text-on-secondary-container rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-secondary-container/20 disabled:opacity-50">
-                {isAccepting[selectedRequest.id] ? 'Sending...' : 'Send Quote (500 EGP)'}
+                {isAccepting[selectedRequest.id] ? 'Opening...' : 'Send Quote'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quote Price Modal */}
+      {quoteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div className="p-5 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-lowest">
+              <h2 className="font-bold text-primary text-lg">Send a Quote</h2>
+              <button onClick={() => setQuoteModal(null)} className="text-on-surface-variant hover:text-error transition-colors">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="bg-surface-container-low rounded-xl p-4">
+                <p className="text-xs font-bold text-on-surface-variant uppercase mb-1">Request</p>
+                <p className="font-semibold text-on-surface text-sm">{quoteModal.request.category?.name || quoteModal.request.title || 'Service Request'}</p>
+                <p className="text-xs text-on-surface-variant mt-1 line-clamp-2">{quoteModal.request.description}</p>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-on-surface-variant uppercase mb-2 block">Your Price (EGP) *</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-bold text-sm">EGP</span>
+                  <input
+                    type="number" min="1"
+                    value={quoteModal.price}
+                    onChange={e => setQuoteModal(prev => prev ? { ...prev, price: e.target.value } : null)}
+                    placeholder="e.g. 350"
+                    className="w-full pl-14 pr-4 py-3 border border-outline-variant/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary bg-surface-container-low text-lg font-bold"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-on-surface-variant uppercase mb-2 block">Note to Customer (optional)</label>
+                <textarea
+                  value={quoteModal.note}
+                  onChange={e => setQuoteModal(prev => prev ? { ...prev, note: e.target.value } : null)}
+                  placeholder="Describe what's included in your quote..."
+                  className="w-full px-4 py-3 border border-outline-variant/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary bg-surface-container-low resize-none min-h-[80px] text-sm"
+                />
+              </div>
+            </div>
+            <div className="p-5 border-t border-outline-variant/10 bg-surface-container-lowest flex gap-3">
+              <button onClick={() => setQuoteModal(null)} className="flex-1 py-3 text-sm font-semibold text-primary border border-primary/20 rounded-xl hover:bg-primary/5 transition-colors">Cancel</button>
+              <button
+                onClick={handleSubmitQuote}
+                disabled={isSubmittingQuote || !quoteModal.price}
+                className="flex-1 py-3 text-sm font-semibold bg-secondary-container text-on-secondary-container rounded-xl hover:opacity-90 transition-opacity shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isSubmittingQuote
+                  ? <><span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" /> Sending...</>
+                  : <><span className="material-symbols-outlined text-[18px]">send</span> Send Quote{quoteModal.price ? ` (EGP ${quoteModal.price})` : ''}</>
+                }
               </button>
             </div>
           </div>
