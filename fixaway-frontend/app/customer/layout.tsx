@@ -5,6 +5,7 @@ import AuthGuard from '@/components/auth/AuthGuard';
 import { useAuthStore } from '@/store/auth.store';
 import { useRouter } from 'next/navigation';
 import { ToastProvider } from '@/components/ui/ToastProvider';
+import NotificationDropdown from '@/components/layout/NotificationDropdown';
 
 export default function CustomerLayout({ children }: { children: ReactNode }) {
   const { user, clearAuth } = useAuthStore();
@@ -23,9 +24,10 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
           <header className="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md border-b border-outline-variant/30 fixed top-0 w-full z-50 shadow-sm">
             <div className="flex flex-row-reverse justify-between items-center px-gutter w-full max-w-container-max mx-auto h-16">
               <div className="flex items-center gap-md">
-                <button className="text-on-surface-variant hover:bg-primary-container/10 p-sm rounded-full transition-colors active:scale-95 duration-200 flex items-center justify-center">
-              <span className="material-symbols-outlined">support_agent</span>
-            </button>
+                <NotificationDropdown />
+                <button onClick={() => alert('Support Chat coming soon!')} className="text-on-surface-variant hover:bg-primary-container/10 p-sm rounded-full transition-colors active:scale-95 duration-200 flex items-center justify-center">
+                  <span className="material-symbols-outlined">support_agent</span>
+                </button>
             <div className="relative group">
               <div className="w-10 h-10 rounded-full border-2 border-primary-fixed bg-primary-container flex items-center justify-center text-primary font-bold text-sm cursor-pointer">
                 {user?.name?.charAt(0).toUpperCase() || 'C'}
@@ -126,9 +128,9 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
       </nav>
 
       {/* Roadside Emergency FAB */}
-      <button className="fixed bottom-24 right-6 lg:bottom-10 lg:right-auto lg:left-10 w-16 h-16 bg-secondary text-white rounded-full shadow-2xl flex items-center justify-center z-50 hover:scale-110 active:scale-95 transition-transform">
+      <Link href="/customer/emergency" className="fixed bottom-24 right-6 lg:bottom-10 lg:right-auto lg:left-10 w-16 h-16 bg-secondary text-white rounded-full shadow-2xl flex items-center justify-center z-50 hover:scale-110 active:scale-95 transition-transform">
         <span className="material-symbols-outlined text-3xl">emergency</span>
-      </button>
+      </Link>
       </div>
       </ToastProvider>
     </AuthGuard>

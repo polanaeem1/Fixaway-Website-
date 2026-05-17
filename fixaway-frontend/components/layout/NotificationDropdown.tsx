@@ -7,12 +7,17 @@ export default function NotificationDropdown() {
   const [unreadCount, setUnreadCount] = useState(3);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const MOCK_NOTIFICATIONS = [
+  const [notifications, setNotifications] = useState([
     { id: 1, title: 'Order Confirmed', body: 'Technician Ahmed accepted your request.', time: '2m ago', read: false, icon: 'check_circle', color: 'text-green-500' },
     { id: 2, title: 'Quotation Received', body: 'You have a new quotation for AC Maintenance.', time: '1h ago', read: false, icon: 'request_quote', color: 'text-secondary' },
     { id: 3, title: 'Wallet Top Up', body: 'EGP 500 added to your wallet securely.', time: '2h ago', read: false, icon: 'account_balance_wallet', color: 'text-primary' },
     { id: 4, title: 'Welcome to Fixaway!', body: 'Complete your profile to get started.', time: '1d ago', read: true, icon: 'waving_hand', color: 'text-orange-400' },
-  ];
+  ]);
+
+  const handleMarkAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    setUnreadCount(0);
+  };
 
   const handleOpen = () => {
     setIsOpen(!isOpen);
@@ -53,11 +58,11 @@ export default function NotificationDropdown() {
                 <span className="bg-error/10 text-error text-[10px] px-2 py-0.5 rounded-full font-bold">{unreadCount} New</span>
               )}
             </h3>
-            <button className="text-xs font-semibold text-secondary hover:underline">Mark all as read</button>
+            <button onClick={handleMarkAllRead} className="text-xs font-semibold text-secondary hover:underline">Mark all as read</button>
           </div>
           
           <div className="max-h-96 overflow-y-auto divide-y divide-outline-variant/5">
-            {MOCK_NOTIFICATIONS.map(notif => (
+            {notifications.map(notif => (
               <div key={notif.id} className={`p-4 hover:bg-surface-container-lowest transition-colors cursor-pointer flex gap-3 ${!notif.read && unreadCount > 0 ? 'bg-primary/5' : ''}`}>
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-surface-container flex-shrink-0 ${notif.color}`}>
                   <span className="material-symbols-outlined text-[20px]">{notif.icon}</span>

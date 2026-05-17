@@ -90,7 +90,7 @@ export default function CustomerDashboardPage() {
     }
 
     return () => { document.removeEventListener('visibilitychange', handleVisibility); };
-  }, [accessToken, fetchData]);
+  }, [accessToken, fetchData, showToast]);
 
   const handleAcceptQuote = async (quoteId: string) => {
     if (!accessToken) return;

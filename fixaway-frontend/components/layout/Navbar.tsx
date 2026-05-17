@@ -46,7 +46,7 @@ export default function Navbar() {
           {isAuthenticated ? (
             <>
               <NotificationDropdown />
-              <button className="text-on-surface-variant hover:bg-primary-container/10 p-2 rounded-full transition-colors">
+              <button onClick={() => alert('Support Chat coming soon!')} className="text-on-surface-variant hover:bg-primary-container/10 p-2 rounded-full transition-colors">
                 <span className="material-symbols-outlined">support_agent</span>
               </button>
               <div className="relative group">

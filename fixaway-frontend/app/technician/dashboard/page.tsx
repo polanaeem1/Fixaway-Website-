@@ -88,7 +88,7 @@ export default function TechnicianDashboardPage() {
     }
 
     return () => { document.removeEventListener('visibilitychange', handleVisibility); };
-  }, [accessToken, fetchData]);
+  }, [accessToken, fetchData, showToast]);
 
   const toggleOnline = async () => {
     const next = !isOnline;

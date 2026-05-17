@@ -1,10 +1,10 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore, Role } from '@/store/auth.store';
 import { authApi, ApiError } from '@/lib/api';
-import { useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const roleRedirects: Record<Role, string> = {
   CUSTOMER: '/customer/dashboard',
@@ -21,6 +21,20 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<{email?: string, password?: string}>({});
+  const [shake, setShake] = useState(false);
+
+  const validate = () => {
+    const errs: {email?: string, password?: string} = {};
+    if (!email) errs.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = "Please enter a valid email address";
+
+    if (!password) errs.password = "Password is required";
+    else if (password.length < 6) errs.password = "Password must be at least 6 characters";
+
+    setFieldErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
 
   // Redirect already-logged-in users to their dashboard
   useEffect(() => {
@@ -31,6 +45,11 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validate()) {
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+      return;
+    }
     setError('');
     setLoading(true);
     try {
@@ -104,33 +123,54 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <motion.form 
+            onSubmit={handleSubmit} 
+            className="space-y-5"
+            animate={shake ? { x: [-10, 10, -10, 10, -5, 5, 0] } : {}}
+            transition={{ duration: 0.4 }}
+          >
             <div>
               <label className="block text-sm font-semibold text-on-surface-variant mb-2">Email Address</label>
               <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">mail</span>
+                <span className={`material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] transition-colors ${fieldErrors.email ? 'text-error' : 'text-outline'}`}>mail</span>
                 <input
-                  type="email" value={email} onChange={e => setEmail(e.target.value)}
-                  placeholder="you@example.com" required
-                  className="w-full pl-10 pr-4 py-3 bg-surface-container-low border border-outline-variant/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                  type="email" value={email} 
+                  onChange={e => { setEmail(e.target.value); if (fieldErrors.email) setFieldErrors(prev => ({...prev, email: undefined})); }}
+                  placeholder="you@example.com" 
+                  className={`w-full pl-10 pr-4 py-3 bg-surface-container-low border rounded-xl focus:outline-none focus:ring-2 transition-all ${fieldErrors.email ? 'border-error/50 focus:ring-error text-error' : 'border-outline-variant/50 focus:ring-primary'}`}
                 />
               </div>
+              <AnimatePresence>
+                {fieldErrors.email && (
+                  <motion.p initial={{ opacity: 0, height: 0, marginTop: 0 }} animate={{ opacity: 1, height: 'auto', marginTop: 8 }} exit={{ opacity: 0, height: 0, marginTop: 0 }} className="text-error text-xs font-semibold flex items-center gap-1 overflow-hidden">
+                    <span className="material-symbols-outlined text-[14px]">error</span> {fieldErrors.email}
+                  </motion.p>
+                )}
+              </AnimatePresence>
             </div>
 
             <div>
               <label className="block text-sm font-semibold text-on-surface-variant mb-2">Password</label>
               <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">lock</span>
+                <span className={`material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] transition-colors ${fieldErrors.password ? 'text-error' : 'text-outline'}`}>lock</span>
                 <input
                   type={showPassword ? 'text' : 'password'} value={password}
-                  onChange={e => setPassword(e.target.value)} placeholder="Enter your password" required
-                  className="w-full pl-10 pr-12 py-3 bg-surface-container-low border border-outline-variant/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                  onChange={e => { setPassword(e.target.value); if (fieldErrors.password) setFieldErrors(prev => ({...prev, password: undefined})); }} 
+                  placeholder="Enter your password" 
+                  className={`w-full pl-10 pr-12 py-3 bg-surface-container-low border rounded-xl focus:outline-none focus:ring-2 transition-all ${fieldErrors.password ? 'border-error/50 focus:ring-error text-error' : 'border-outline-variant/50 focus:ring-primary'}`}
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface">
                   <span className="material-symbols-outlined text-[20px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
                 </button>
               </div>
+              <AnimatePresence>
+                {fieldErrors.password && (
+                  <motion.p initial={{ opacity: 0, height: 0, marginTop: 0 }} animate={{ opacity: 1, height: 'auto', marginTop: 8 }} exit={{ opacity: 0, height: 0, marginTop: 0 }} className="text-error text-xs font-semibold flex items-center gap-1 overflow-hidden">
+                    <span className="material-symbols-outlined text-[14px]">error</span> {fieldErrors.password}
+                  </motion.p>
+                )}
+              </AnimatePresence>
             </div>
 
             <div className="flex justify-end">
@@ -145,7 +185,7 @@ export default function LoginPage() {
               }
             </button>
 
-          </form>
+          </motion.form>
 
           <p className="text-center text-sm text-on-surface-variant mt-8">
             Don&apos;t have an account?{' '}

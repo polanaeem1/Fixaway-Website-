@@ -1,5 +1,6 @@
+'use client';
 import Navbar from '@/components/layout/Navbar';
-
+import Link from 'next/link';
 export default function LandingPage() {
   return (
     <>
@@ -8,11 +9,11 @@ export default function LandingPage() {
         {/* Hero Section */}
         <section className="relative min-h-[870px] flex items-center overflow-hidden bg-surface-container-lowest">
           <div className="absolute inset-0 z-0">
-            <div className="absolute inset-0 bg-gradient-to-l from-surface-container-lowest via-surface-container-lowest/80 to-transparent z-10"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-surface-container-lowest via-surface-container-lowest/80 to-transparent z-10"></div>
             <img className="w-full h-full object-cover" alt="Hero background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfRysUbWl1U0GGz4PYDfe_oS-CbbNdzC4WYiut9410_BP3wT-dH1k-i-rzfexcH6bbWpnYkNl2YqJbe_F6pcpin_psLfxBNqoo_mUtB74hPmNMb8hijuyzLlKr-ibIfjeN-ja7HVSXA_BxWoiRDTeJbDrZOGnHKGquZD_w0xOexRXXnuEpBcgu80JSrMdqzAk9q41e-mKuALo4pL2RFAR4gktQeK7Hq72CA2OLdIoRyGvvNy66glZc0Mteafs9TPNoVqbrw9y9cDk" />
           </div>
           <div className="container mx-auto px-gutter relative z-20 w-full max-w-container-max">
-            <div className="max-w-2xl text-right">
+            <div className="max-w-2xl text-left">
               <span className="bg-primary-container text-white px-md py-xs rounded-full font-label-caps text-label-caps mb-lg inline-block">
                 Fixaway Premium Services
               </span>
@@ -24,14 +25,14 @@ export default function LandingPage() {
                 Premium home maintenance and roadside assistance at your fingertips. Professional, verified technicians ready to serve you 24/7.
               </p>
               <div className="flex flex-col sm:flex-row gap-md">
-                <button className="bg-primary text-white px-xl py-md rounded-lg font-h2 text-body-md flex items-center justify-center gap-sm shadow-lg hover:bg-primary-container transition-all active:scale-95">
+                <Link href="/customer/requests/new" className="bg-primary text-white px-xl py-md rounded-lg font-h2 text-body-md flex items-center justify-center gap-sm shadow-lg hover:bg-primary-container transition-all active:scale-95">
                   <span className="material-symbols-outlined">home_repair_service</span>
                   Book Home Service
-                </button>
-                <button className="bg-secondary-container text-primary px-xl py-md rounded-lg font-h2 text-body-md flex items-center justify-center gap-sm shadow-lg hover:bg-secondary-fixed transition-all active:scale-95">
+                </Link>
+                <Link href="/customer/emergency" className="bg-secondary-container text-primary px-xl py-md rounded-lg font-h2 text-body-md flex items-center justify-center gap-sm shadow-lg hover:bg-secondary-fixed transition-all active:scale-95">
                   <span className="material-symbols-outlined">tire_repair</span>
                   Roadside Assistance
-                </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -183,14 +184,14 @@ export default function LandingPage() {
                 <h2 className="font-display-lg text-display-lg text-white mb-md">Control everything from your phone.</h2>
                 <p className="text-on-primary-container text-body-lg mb-xl font-body-lg">Download the Fixaway app for a faster experience, exclusive discounts, and prioritized service scheduling.</p>
                 <div className="flex flex-wrap gap-md justify-end">
-                  <button className="bg-black text-white px-lg py-sm rounded-lg flex items-center gap-md border border-white/20 hover:bg-white/10 transition-colors">
+                  <button onClick={() => alert('App coming soon!')} className="bg-black text-white px-lg py-sm rounded-lg flex items-center gap-md border border-white/20 hover:bg-white/10 transition-colors">
                     <span className="material-symbols-outlined text-h1">phone_iphone</span>
                     <div className="text-right">
                       <p className="text-[10px] font-label-caps uppercase">Download on</p>
                       <p className="font-bold text-body-md">App Store</p>
                     </div>
                   </button>
-                  <button className="bg-black text-white px-lg py-sm rounded-lg flex items-center gap-md border border-white/20 hover:bg-white/10 transition-colors">
+                  <button onClick={() => alert('App coming soon!')} className="bg-black text-white px-lg py-sm rounded-lg flex items-center gap-md border border-white/20 hover:bg-white/10 transition-colors">
                     <span className="material-symbols-outlined text-h1">play_arrow</span>
                     <div className="text-right">
                       <p className="text-[10px] font-label-caps uppercase">Get it on</p>
@@ -209,29 +210,29 @@ export default function LandingPage() {
 
       {/* BottomNavBar (Mobile Only) */}
       <nav className="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-end pb-4 px-2 bg-surface/90 backdrop-blur-lg border-t border-white/50 shadow-[0px_-4px_20px_rgba(26,54,93,0.05)] z-50">
-        <div className="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full w-12 h-12 mb-2 active:scale-90 transition-transform">
+        <Link href="/" className="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full w-12 h-12 mb-2 active:scale-90 transition-transform">
           <span className="material-symbols-outlined">explore</span>
           <span className="text-[8px] font-label-caps mt-1">Explore</span>
-        </div>
-        <div className="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform">
+        </Link>
+        <Link href="/customer/requests" className="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform">
           <span className="material-symbols-outlined">assignment</span>
           <span className="text-[8px] font-label-caps mt-1">Requests</span>
-        </div>
-        <div className="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform">
+        </Link>
+        <Link href="/customer/emergency" className="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform">
           <span className="material-symbols-outlined">emergency_share</span>
           <span className="text-[8px] font-label-caps mt-1">SOS</span>
-        </div>
-        <div className="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform">
+        </Link>
+        <Link href="/customer/profile" className="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform">
           <span className="material-symbols-outlined">person</span>
           <span className="text-[8px] font-label-caps mt-1">Profile</span>
-        </div>
+        </Link>
       </nav>
 
       {/* SOS FAB */}
-      <button className="fixed bottom-24 right-6 md:right-10 w-16 h-16 bg-secondary-container text-primary rounded-full shadow-2xl flex items-center justify-center z-50 hover:scale-110 active:scale-90 transition-all group border border-white/20">
+      <Link href="/customer/emergency" className="fixed bottom-24 right-6 md:right-10 w-16 h-16 bg-secondary-container text-primary rounded-full shadow-2xl flex items-center justify-center z-50 hover:scale-110 active:scale-90 transition-all group border border-white/20">
         <span className="material-symbols-outlined text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>emergency_share</span>
         <span className="absolute -top-12 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] px-sm py-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">SOS HELP</span>
-      </button>
+      </Link>
     </>
   );
 }

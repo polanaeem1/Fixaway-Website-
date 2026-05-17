@@ -1,18 +1,37 @@
 'use client';
 import Link from 'next/link';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import AuthGuard from '@/components/auth/AuthGuard';
 import { useAuthStore } from '@/store/auth.store';
 import { useRouter } from 'next/navigation';
 import { ToastProvider } from '@/components/ui/ToastProvider';
+import NotificationDropdown from '@/components/layout/NotificationDropdown';
+import { technicianApi } from '@/lib/api';
 
 export default function TechnicianLayout({ children }: { children: ReactNode }) {
-  const { user, clearAuth } = useAuthStore();
+  const { user, clearAuth, accessToken } = useAuthStore();
   const router = useRouter();
+  const [isOnline, setIsOnline] = useState(true);
+  const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
   const handleLogout = () => {
     clearAuth();
     router.replace('/login');
+  };
+
+  const toggleOnline = async () => {
+    if (!accessToken || isTogglingStatus) return;
+    const next = !isOnline;
+    setIsOnline(next);
+    setIsTogglingStatus(true);
+    try {
+      await technicianApi.setOnlineStatus(accessToken, next);
+    } catch {
+      // Revert on failure
+      setIsOnline(!next);
+    } finally {
+      setIsTogglingStatus(false);
+    }
   };
 
   return (
@@ -46,21 +65,24 @@ export default function TechnicianLayout({ children }: { children: ReactNode }) 
           
           <div className="flex items-center gap-lg">
             {/* Availability Toggle */}
-            <div className="flex items-center bg-surface-container-high rounded-full px-sm py-1 border border-outline-variant/20">
-              <span className="font-label-caps text-label-caps ml-2 text-on-surface-variant">ONLINE</span>
-              <button className="w-12 h-6 bg-primary-container rounded-full relative flex items-center px-1 transition-all active:scale-95 duration-200">
-                <div className="w-4 h-4 bg-white rounded-full translate-x-6"></div>
-              </button>
-            </div>
+            <button
+              onClick={toggleOnline}
+              disabled={isTogglingStatus}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border font-semibold text-sm transition-all active:scale-95 disabled:opacity-70 ${
+                isOnline
+                  ? 'bg-green-50 border-green-200 text-green-700'
+                  : 'bg-surface-container border-outline-variant text-on-surface-variant'
+              }`}
+            >
+              <div className={`w-2.5 h-2.5 rounded-full transition-colors ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-outline-variant'}`} />
+              {isOnline ? 'Online' : 'Offline'}
+            </button>
             
             <div className="flex items-center gap-md text-primary">
-              <button className="hover:bg-primary-container/10 transition-colors p-2 rounded-lg active:scale-95 duration-200">
+              <button onClick={() => alert('Support Chat coming soon!')} className="hover:bg-primary-container/10 transition-colors p-2 rounded-lg active:scale-95 duration-200">
                 <span className="material-symbols-outlined">support_agent</span>
               </button>
-              <button className="hover:bg-primary-container/10 transition-colors p-2 rounded-lg relative active:scale-95 duration-200">
-                <span className="material-symbols-outlined">notifications</span>
-                <span className="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full"></span>
-              </button>
+              <NotificationDropdown />
             </div>
           </div>
         </div>
@@ -121,11 +143,11 @@ export default function TechnicianLayout({ children }: { children: ReactNode }) 
         </Link>
       </nav>
 
-      {/* Roadside Emergency FAB */}
-      <button className="fixed bottom-24 left-6 md:bottom-10 md:left-10 w-16 h-16 bg-secondary-container text-white rounded-full shadow-2xl flex items-center justify-center z-50 hover:scale-110 active:scale-90 transition-transform group">
-        <span className="material-symbols-outlined text-[32px]">warning</span>
-        <span className="absolute left-full ml-4 bg-primary px-4 py-2 rounded-lg text-white font-label-caps whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rtl:right-full rtl:mr-4 rtl:left-auto rtl:ml-0">طوارئ الطريق</span>
-      </button>
+      {/* Emergency FAB */}
+      <Link href="/technician/requests" className="fixed bottom-24 left-6 md:bottom-10 md:left-10 w-16 h-16 bg-secondary-container text-primary rounded-full shadow-2xl flex items-center justify-center z-50 hover:scale-110 active:scale-90 transition-transform group">
+        <span className="material-symbols-outlined text-[32px]">work_history</span>
+        <span className="absolute left-full ml-4 bg-primary px-4 py-2 rounded-lg text-white font-bold text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">My Jobs</span>
+      </Link>
         </div>
       </ToastProvider>
     </AuthGuard>
