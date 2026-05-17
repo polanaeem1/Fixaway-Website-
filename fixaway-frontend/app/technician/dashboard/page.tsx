@@ -261,9 +261,8 @@ export default function TechnicianDashboardPage() {
                     </button>
                     <button 
                       onClick={() => handleAcceptRequest(r.id)}
-                      disabled={isAccepting[r.id]}
-                      className="flex-1 bg-secondary-container text-on-secondary-container text-xs font-semibold py-1.5 rounded-lg hover:opacity-90 transition-all disabled:opacity-50">
-                      {isAccepting[r.id] ? '...' : 'Send Quote (500 EGP)'}
+                      className="flex-1 bg-secondary-container text-on-secondary-container text-xs font-semibold py-1.5 rounded-lg hover:opacity-90 transition-all">
+                      Send Quote
                     </button>
                   </div>
                 </div>
