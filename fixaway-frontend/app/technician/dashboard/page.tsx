@@ -69,12 +69,12 @@ export default function TechnicianDashboardPage() {
           if (prev.find((r: any) => r.id === newRequest.id)) return prev;
           return [newRequest, ...prev];
         });
-        showToast('🔔 New service request nearby!', 'info');
+        showToast('New service request nearby!', 'info');
       };
 
       const handleQuotationAccepted = (order: any) => {
         console.log('[Socket] quotation_accepted:', order);
-        showToast('✅ Your quote was accepted! A new job is ready.', 'success');
+        showToast('Your quote was accepted! A new job is ready.', 'success');
         fetchData();
       };
 

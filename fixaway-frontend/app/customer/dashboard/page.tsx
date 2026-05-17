@@ -97,7 +97,7 @@ export default function CustomerDashboardPage() {
     setIsAcceptingQuote(prev => ({ ...prev, [quoteId]: true }));
     try {
       await quotationsApi.accept(accessToken, quoteId);
-      showToast('✅ Quote accepted! The technician will be on their way.', 'success');
+      showToast('Quote accepted! The technician will be on their way.', 'success');
       await fetchData();
     } catch (err: any) {
       showToast(err.message || 'Failed to accept quote', 'error');

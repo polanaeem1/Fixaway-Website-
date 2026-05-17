@@ -56,7 +56,7 @@ export default function CustomerRequestsPage() {
     setIsAccepting(prev => ({ ...prev, [quoteId]: true }));
     try {
       await quotationsApi.accept(accessToken, quoteId);
-      showToast('✅ Quote accepted! The technician will be on their way.', 'success');
+      showToast('Quote accepted! The technician will be on their way.', 'success');
       await fetchData();
     } catch (err: any) {
       showToast(err.message || 'Failed to accept quote', 'error');
@@ -70,7 +70,7 @@ export default function CustomerRequestsPage() {
     setIsSubmittingReview(true);
     try {
       await reviewsApi.submit(accessToken, reviewModal.orderId, reviewModal.rating, reviewModal.comment);
-      showToast('⭐ Review submitted! Thank you for your feedback.', 'success');
+      showToast('Review submitted! Thank you for your feedback.', 'success');
       setReviewModal(null);
     } catch (err: any) {
       showToast(err.message || 'Failed to submit review', 'error');

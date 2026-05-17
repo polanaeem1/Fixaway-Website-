@@ -31,7 +31,7 @@ export default function CustomerProfilePage() {
       setAuth(data, accessToken, useAuthStore.getState().refreshToken || '');
       setIsEditing(false);
       setFormData(prev => ({ ...prev, password: '' }));
-      showToast('✅ Profile updated successfully!', 'success');
+      showToast('Profile updated successfully!', 'success');
     } catch (err: any) {
       showToast(err.message || 'Failed to update profile', 'error');
     } finally {
