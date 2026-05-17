@@ -4,8 +4,17 @@ import { ReactNode } from 'react';
 import AuthGuard from '@/components/auth/AuthGuard';
 import { useAuthStore } from '@/store/auth.store';
 import { useRouter } from 'next/navigation';
-import { ToastProvider } from '@/components/ui/ToastProvider';
+import { useToast } from '@/components/ui/ToastProvider';
 import NotificationDropdown from '@/components/layout/NotificationDropdown';
+
+function SupportChatButton() {
+  const { showToast } = useToast();
+  return (
+    <button onClick={() => showToast('Support Chat coming soon!', 'info')} className="text-on-surface-variant hover:bg-primary-container/10 p-sm rounded-full transition-colors active:scale-95 duration-200 flex items-center justify-center">
+      <span className="material-symbols-outlined">support_agent</span>
+    </button>
+  );
+}
 
 export default function CustomerLayout({ children }: { children: ReactNode }) {
   const { user, clearAuth } = useAuthStore();
@@ -18,16 +27,13 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
 
   return (
     <AuthGuard requiredRole="CUSTOMER">
-      <ToastProvider>
-        <div className="min-h-screen bg-background pb-24 lg:pb-0">
-          {/* TopAppBar */}
+      <div className="min-h-screen bg-background pb-24 lg:pb-0">
+        {/* TopAppBar */}
           <header className="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md border-b border-outline-variant/30 fixed top-0 w-full z-50 shadow-sm">
             <div className="flex flex-row-reverse justify-between items-center px-gutter w-full max-w-container-max mx-auto h-16">
               <div className="flex items-center gap-md">
                 <NotificationDropdown />
-                <button onClick={() => alert('Support Chat coming soon!')} className="text-on-surface-variant hover:bg-primary-container/10 p-sm rounded-full transition-colors active:scale-95 duration-200 flex items-center justify-center">
-                  <span className="material-symbols-outlined">support_agent</span>
-                </button>
+                <SupportChatButton />
             <div className="relative group">
               <div className="w-10 h-10 rounded-full border-2 border-primary-fixed bg-primary-container flex items-center justify-center text-primary font-bold text-sm cursor-pointer">
                 {user?.name?.charAt(0).toUpperCase() || 'C'}
@@ -132,7 +138,6 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
         <span className="material-symbols-outlined text-3xl">emergency</span>
       </Link>
       </div>
-      </ToastProvider>
     </AuthGuard>
   );
 }

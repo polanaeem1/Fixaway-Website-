@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { uploadApi, requestsApi } from '@/lib/api';
 import { useAuthStore } from '@/store/auth.store';
+import { useToast } from '@/components/ui/ToastProvider';
 
 const MapPicker = dynamic(() => import('@/components/ui/MapPicker'), {
   ssr: false,
@@ -22,7 +23,7 @@ function NewServiceRequestContent() {
   const [title, setTitle] = useState(initialCategory ? `${initialCategory} Issue` : '');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState('');
+  const { showToast } = useToast();
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -47,12 +48,11 @@ function NewServiceRequestContent() {
 
   const handleSubmit = async () => {
     if (!accessToken) {
-      setSubmitError('You must be logged in to submit a request.');
+      showToast('You must be logged in to submit a request.', 'error');
       return;
     }
 
     setIsSubmitting(true);
-    setSubmitError('');
 
     try {
       // Step 1: Upload all media files to Supabase Storage
@@ -73,9 +73,10 @@ function NewServiceRequestContent() {
         mediaUrls,
       });
 
+      showToast('Request submitted successfully!', 'success');
       setSubmitSuccess(true);
     } catch (err: any) {
-      setSubmitError(err.message || 'Something went wrong. Please try again.');
+      showToast(err.message || 'Something went wrong. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -200,12 +201,6 @@ function NewServiceRequestContent() {
         {isMapModalOpen && (
           <div className="h-[400px] w-full rounded-xl overflow-hidden border border-outline-variant shadow-inner fade-in">
              <MapPicker initialLocation={{ lat: location.lat, lng: location.lng }} onLocationSelect={(lat, lng, address) => setLocation({ lat, lng, address })} />
-          </div>
-        )}
-
-        {submitError && (
-          <div className="p-md rounded-lg bg-error/10 border border-error/30 text-error font-body-md text-center">
-            {submitError}
           </div>
         )}
 

@@ -4,9 +4,18 @@ import { ReactNode, useState } from 'react';
 import AuthGuard from '@/components/auth/AuthGuard';
 import { useAuthStore } from '@/store/auth.store';
 import { useRouter } from 'next/navigation';
-import { ToastProvider } from '@/components/ui/ToastProvider';
+import { useToast } from '@/components/ui/ToastProvider';
 import NotificationDropdown from '@/components/layout/NotificationDropdown';
 import { technicianApi } from '@/lib/api';
+
+function SupportChatButton() {
+  const { showToast } = useToast();
+  return (
+    <button onClick={() => showToast('Support Chat coming soon!', 'info')} className="hover:bg-primary-container/10 transition-colors p-2 rounded-lg active:scale-95 duration-200">
+      <span className="material-symbols-outlined">support_agent</span>
+    </button>
+  );
+}
 
 export default function TechnicianLayout({ children }: { children: ReactNode }) {
   const { user, clearAuth, accessToken } = useAuthStore();
@@ -36,9 +45,8 @@ export default function TechnicianLayout({ children }: { children: ReactNode }) 
 
   return (
     <AuthGuard requiredRole="TECHNICIAN">
-      <ToastProvider>
-        <div className="min-h-screen bg-background pb-24 md:pb-0">
-          {/* TopAppBar */}
+      <div className="min-h-screen bg-background pb-24 md:pb-0">
+        {/* TopAppBar */}
       <header className="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md border-b border-outline-variant/30 fixed top-0 w-full z-50 shadow-sm">
         <div className="flex flex-row-reverse justify-between items-center px-gutter w-full max-w-container-max mx-auto h-16">
           <div className="flex items-center gap-md">
@@ -79,9 +87,7 @@ export default function TechnicianLayout({ children }: { children: ReactNode }) 
             </button>
             
             <div className="flex items-center gap-md text-primary">
-              <button onClick={() => alert('Support Chat coming soon!')} className="hover:bg-primary-container/10 transition-colors p-2 rounded-lg active:scale-95 duration-200">
-                <span className="material-symbols-outlined">support_agent</span>
-              </button>
+              <SupportChatButton />
               <NotificationDropdown />
             </div>
           </div>
@@ -148,8 +154,7 @@ export default function TechnicianLayout({ children }: { children: ReactNode }) 
         <span className="material-symbols-outlined text-[32px]">work_history</span>
         <span className="absolute left-full ml-4 bg-primary px-4 py-2 rounded-lg text-white font-bold text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">My Jobs</span>
       </Link>
-        </div>
-      </ToastProvider>
+      </div>
     </AuthGuard>
   );
 }

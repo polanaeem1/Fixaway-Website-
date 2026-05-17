@@ -1,7 +1,10 @@
 'use client';
 import Navbar from '@/components/layout/Navbar';
 import Link from 'next/link';
+import { useToast } from '@/components/ui/ToastProvider';
+
 export default function LandingPage() {
+  const { showToast } = useToast();
   return (
     <>
       <Navbar />
@@ -184,14 +187,14 @@ export default function LandingPage() {
                 <h2 className="font-display-lg text-display-lg text-white mb-md">Control everything from your phone.</h2>
                 <p className="text-on-primary-container text-body-lg mb-xl font-body-lg">Download the Fixaway app for a faster experience, exclusive discounts, and prioritized service scheduling.</p>
                 <div className="flex flex-wrap gap-md justify-end">
-                  <button onClick={() => alert('App coming soon!')} className="bg-black text-white px-lg py-sm rounded-lg flex items-center gap-md border border-white/20 hover:bg-white/10 transition-colors">
+                  <button onClick={() => showToast('App coming soon!', 'info')} className="bg-black text-white px-lg py-sm rounded-lg flex items-center gap-md border border-white/20 hover:bg-white/10 transition-colors">
                     <span className="material-symbols-outlined text-h1">phone_iphone</span>
                     <div className="text-right">
                       <p className="text-[10px] font-label-caps uppercase">Download on</p>
                       <p className="font-bold text-body-md">App Store</p>
                     </div>
                   </button>
-                  <button onClick={() => alert('App coming soon!')} className="bg-black text-white px-lg py-sm rounded-lg flex items-center gap-md border border-white/20 hover:bg-white/10 transition-colors">
+                  <button onClick={() => showToast('App coming soon!', 'info')} className="bg-black text-white px-lg py-sm rounded-lg flex items-center gap-md border border-white/20 hover:bg-white/10 transition-colors">
                     <span className="material-symbols-outlined text-h1">play_arrow</span>
                     <div className="text-right">
                       <p className="text-[10px] font-label-caps uppercase">Get it on</p>

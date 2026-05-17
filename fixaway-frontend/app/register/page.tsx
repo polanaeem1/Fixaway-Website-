@@ -163,7 +163,7 @@ export default function RegisterPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-on-surface-variant mb-2">First Name</label>
-                  <input value={firstName} onChange={e => { setFirstName(e.target.value); if (fieldErrors.firstName) setFieldErrors(prev => ({...prev, firstName: undefined})); }} type="text" placeholder="John"
+                  <input value={firstName} onChange={e => { setFirstName(e.target.value); if (fieldErrors.firstName) setFieldErrors(prev => ({...prev, firstName: ''})); }} type="text" placeholder="John"
                     className={`w-full px-4 py-3 bg-surface-container-low border rounded-xl focus:outline-none focus:ring-2 transition-all ${fieldErrors.firstName ? 'border-error/50 focus:ring-error text-error' : 'border-outline-variant/50 focus:ring-primary'}`} />
                   <AnimatePresence>
                     {fieldErrors.firstName && (
@@ -175,7 +175,7 @@ export default function RegisterPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-on-surface-variant mb-2">Last Name</label>
-                  <input value={lastName} onChange={e => { setLastName(e.target.value); if (fieldErrors.lastName) setFieldErrors(prev => ({...prev, lastName: undefined})); }} type="text" placeholder="Doe"
+                  <input value={lastName} onChange={e => { setLastName(e.target.value); if (fieldErrors.lastName) setFieldErrors(prev => ({...prev, lastName: ''})); }} type="text" placeholder="Doe"
                     className={`w-full px-4 py-3 bg-surface-container-low border rounded-xl focus:outline-none focus:ring-2 transition-all ${fieldErrors.lastName ? 'border-error/50 focus:ring-error text-error' : 'border-outline-variant/50 focus:ring-primary'}`} />
                   <AnimatePresence>
                     {fieldErrors.lastName && (
@@ -190,7 +190,7 @@ export default function RegisterPage() {
                 <label className="block text-sm font-semibold text-on-surface-variant mb-2">Email Address</label>
                 <div className="relative">
                   <span className={`material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] transition-colors ${fieldErrors.email ? 'text-error' : 'text-outline'}`}>mail</span>
-                  <input value={email} onChange={e => { setEmail(e.target.value); if (fieldErrors.email) setFieldErrors(prev => ({...prev, email: undefined})); }} type="email" placeholder="you@example.com"
+                  <input value={email} onChange={e => { setEmail(e.target.value); if (fieldErrors.email) setFieldErrors(prev => ({...prev, email: ''})); }} type="email" placeholder="you@example.com"
                     className={`w-full pl-10 pr-4 py-3 bg-surface-container-low border rounded-xl focus:outline-none focus:ring-2 transition-all ${fieldErrors.email ? 'border-error/50 focus:ring-error text-error' : 'border-outline-variant/50 focus:ring-primary'}`} />
                 </div>
                 <AnimatePresence>
@@ -205,7 +205,7 @@ export default function RegisterPage() {
                 <label className="block text-sm font-semibold text-on-surface-variant mb-2">Phone Number</label>
                 <div className="relative">
                   <span className={`material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] transition-colors ${fieldErrors.phone ? 'text-error' : 'text-outline'}`}>phone</span>
-                  <input value={phone} onChange={e => { setPhone(e.target.value); if (fieldErrors.phone) setFieldErrors(prev => ({...prev, phone: undefined})); }} type="tel" placeholder="+20 1XX XXX XXXX"
+                  <input value={phone} onChange={e => { setPhone(e.target.value); if (fieldErrors.phone) setFieldErrors(prev => ({...prev, phone: ''})); }} type="tel" placeholder="+20 1XX XXX XXXX"
                     className={`w-full pl-10 pr-4 py-3 bg-surface-container-low border rounded-xl focus:outline-none focus:ring-2 transition-all ${fieldErrors.phone ? 'border-error/50 focus:ring-error text-error' : 'border-outline-variant/50 focus:ring-primary'}`} />
                 </div>
                 <AnimatePresence>
@@ -220,7 +220,7 @@ export default function RegisterPage() {
                 <label className="block text-sm font-semibold text-on-surface-variant mb-2">Password</label>
                 <div className="relative">
                   <span className={`material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] transition-colors ${fieldErrors.password ? 'text-error' : 'text-outline'}`}>lock</span>
-                  <input value={password} onChange={e => { setPassword(e.target.value); if (fieldErrors.password) setFieldErrors(prev => ({...prev, password: undefined})); }} type="password" placeholder="Create a strong password"
+                  <input value={password} onChange={e => { setPassword(e.target.value); if (fieldErrors.password) setFieldErrors(prev => ({...prev, password: ''})); }} type="password" placeholder="Create a strong password"
                     className={`w-full pl-10 pr-4 py-3 bg-surface-container-low border rounded-xl focus:outline-none focus:ring-2 transition-all ${fieldErrors.password ? 'border-error/50 focus:ring-error text-error' : 'border-outline-variant/50 focus:ring-primary'}`} />
                 </div>
                 <AnimatePresence>
@@ -268,7 +268,7 @@ export default function RegisterPage() {
                 <label className="block text-sm font-semibold text-on-surface-variant mb-3">Your Service Categories</label>
                 <div className="flex flex-wrap gap-2">
                   {services.map(s => (
-                    <button key={s} onClick={() => { toggleService(s); if (fieldErrors.services) setFieldErrors(prev => ({...prev, services: undefined})); }}
+                    <button key={s} onClick={() => { toggleService(s); if (fieldErrors.services) setFieldErrors(prev => ({...prev, services: ''})); }}
                       className={`px-4 py-2 rounded-full text-sm font-medium border transition-all ${selectedServices.includes(s) ? 'bg-primary text-white border-primary' : fieldErrors.services ? 'border-error/50 text-error' : 'border-outline-variant/50 text-on-surface-variant hover:border-primary/40'}`}>
                       {s}
                     </button>

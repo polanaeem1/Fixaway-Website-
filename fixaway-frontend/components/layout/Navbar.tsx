@@ -3,9 +3,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
 import NotificationDropdown from './NotificationDropdown';
+import { useToast } from '@/components/ui/ToastProvider';
 
 export default function Navbar() {
   const { isAuthenticated, user, clearAuth } = useAuthStore();
+  const { showToast } = useToast();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -46,7 +48,7 @@ export default function Navbar() {
           {isAuthenticated ? (
             <>
               <NotificationDropdown />
-              <button onClick={() => alert('Support Chat coming soon!')} className="text-on-surface-variant hover:bg-primary-container/10 p-2 rounded-full transition-colors">
+              <button onClick={() => showToast('Support Chat coming soon!', 'info')} className="text-on-surface-variant hover:bg-primary-container/10 p-2 rounded-full transition-colors">
                 <span className="material-symbols-outlined">support_agent</span>
               </button>
               <div className="relative group">

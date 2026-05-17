@@ -10,6 +10,7 @@ export interface AuthUser {
   phone?: string;
   role: Role;
   avatarUrl?: string;
+  technicianProfile?: any;
 }
 
 interface AuthState {

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/auth.store';
 import { walletApi } from '@/lib/api';
+import { useToast } from '@/components/ui/ToastProvider';
 
 
 
@@ -10,6 +11,7 @@ export default function CustomerWalletPage() {
   const [balance, setBalance] = useState<number | null>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { showToast } = useToast();
 
   // Top-Up Modal State
   const [isTopUpOpen, setIsTopUpOpen] = useState(false);
@@ -62,8 +64,9 @@ export default function CustomerWalletPage() {
         setTransactions(Array.isArray(txData) ? txData : []);
       }
       setTopUpAmount('500');
+      showToast('Funds added successfully!', 'success');
     } catch (e: any) {
-      alert(e.message || 'Top-up failed. Please try again.');
+      showToast(e.message || 'Top-up failed. Please try again.', 'error');
     } finally {
       setIsProcessing(false);
     }
