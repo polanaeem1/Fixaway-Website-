@@ -10,7 +10,11 @@ import NotificationDropdown from '@/components/layout/NotificationDropdown';
 function SupportChatButton() {
   const { showToast } = useToast();
   return (
-    <button onClick={() => showToast('Support Chat coming soon!', 'info')} className="text-on-surface-variant hover:bg-primary-container/10 p-sm rounded-full transition-colors active:scale-95 duration-200 flex items-center justify-center">
+    <button
+      aria-label="Contact Support"
+      onClick={() => showToast('Support Chat coming soon!', 'info')}
+      className="text-on-surface-variant hover:bg-primary-container/10 p-sm rounded-full transition-colors active:scale-95 duration-200 flex items-center justify-center"
+    >
       <span className="material-symbols-outlined">support_agent</span>
     </button>
   );
@@ -49,14 +53,6 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
                 </button>
               </div>
             </div>
-          </div>
-          <div className="flex-1 max-w-md mx-lg hidden md:block relative group">
-            <span className="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-outline">search</span>
-            <input 
-              className="w-full bg-surface-container-low border-none rounded-full py-sm pr-12 pl-md focus:ring-2 focus:ring-primary text-body-md transition-all" 
-              placeholder="Search services..." 
-              type="text"
-            />
           </div>
           <div className="font-h1 text-h1 text-primary tracking-tight">Fixaway</div>
         </div>

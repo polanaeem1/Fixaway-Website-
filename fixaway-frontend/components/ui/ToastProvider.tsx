@@ -37,7 +37,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       
       {/* Toast Container - Top Center */}
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2 pointer-events-none w-full max-w-md px-4">
+      <div
+        role="alert"
+        aria-live="polite"
+        aria-atomic="false"
+        className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2 pointer-events-none w-full max-w-md px-4"
+      >
         {toasts.map((toast) => (
           <div
             key={toast.id}

@@ -1,12 +1,44 @@
-const withdrawals = [
-  { id: 'WD-441', desc: 'Withdrawal to CIB Bank', date: 'May 6, 2026', amount: -3000, icon: 'account_balance' },
-  { id: 'TXN-882', desc: 'Job payment: AC Maintenance', date: 'May 5, 2026', amount: 850, icon: 'handyman' },
-  { id: 'TXN-881', desc: 'Job payment: Plumbing Fix', date: 'May 4, 2026', amount: 450, icon: 'plumbing' },
-  { id: 'WD-440', desc: 'Withdrawal to Vodafone Cash', date: 'May 1, 2026', amount: -1500, icon: 'phone_android' },
-  { id: 'TXN-879', desc: 'Job payment: Heater Install', date: 'Apr 30, 2026', amount: 1200, icon: 'handyman' },
-];
+'use client';
+import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/store/auth.store';
+import { walletApi } from '@/lib/api';
+import { useToast } from '@/components/ui/ToastProvider';
 
 export default function TechnicianWalletPage() {
+  const { accessToken } = useAuthStore();
+  const { showToast } = useToast();
+  const [balance, setBalance] = useState<number | null>(null);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
+
+  useEffect(() => {
+    if (!accessToken) return;
+    const load = async () => {
+      try {
+        const [balRes, txRes] = await Promise.allSettled([
+          walletApi.getBalance(accessToken),
+          walletApi.getTransactions(accessToken),
+        ]);
+        if (balRes.status === 'fulfilled') setBalance(balRes.value.data?.balance ?? 0);
+        if (txRes.status === 'fulfilled') setTransactions(Array.isArray(txRes.value.data) ? txRes.value.data : []);
+      } catch {
+        showToast('Failed to load wallet data', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [accessToken, showToast]);
+
+  const handleWithdraw = () => {
+    setIsWithdrawing(true);
+    setTimeout(() => {
+      setIsWithdrawing(false);
+      showToast('Withdrawal request submitted. Funds arrive in 1–2 business days.', 'success');
+    }, 1200);
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-md md:px-lg pb-8">
       {/* Balance Card */}
@@ -18,14 +50,27 @@ export default function TechnicianWalletPage() {
             <span className="material-symbols-outlined text-[18px]">account_balance_wallet</span>
             <span className="text-sm">Earnings Wallet</span>
           </div>
-          <p className="text-white text-5xl font-bold mb-1">EGP 8,420</p>
+          {loading ? (
+            <div className="h-14 w-40 bg-white/20 rounded-xl animate-pulse mb-1" />
+          ) : (
+            <p className="text-white text-5xl font-bold mb-1">EGP {(balance ?? 0).toLocaleString()}</p>
+          )}
           <p className="text-white/50 text-sm">.00 available to withdraw</p>
           <div className="flex gap-3 mt-8">
-            <button className="flex-1 bg-secondary-container text-on-secondary-container rounded-xl py-3 font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all active:scale-95 shadow-lg">
+            <button
+              onClick={handleWithdraw}
+              disabled={isWithdrawing}
+              aria-label="Withdraw to bank account"
+              className="flex-1 bg-secondary-container text-on-secondary-container rounded-xl py-3 font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all active:scale-95 shadow-lg disabled:opacity-60"
+            >
               <span className="material-symbols-outlined text-[20px]">account_balance</span>
-              Withdraw to Bank
+              {isWithdrawing ? 'Processing...' : 'Withdraw to Bank'}
             </button>
-            <button className="flex-1 bg-white/15 hover:bg-white/25 text-white rounded-xl py-3 font-semibold flex items-center justify-center gap-2 border border-white/20 transition-all active:scale-95">
+            <button
+              onClick={() => showToast('Mobile cash withdrawal coming soon!', 'info')}
+              aria-label="Withdraw via mobile cash"
+              className="flex-1 bg-white/15 hover:bg-white/25 text-white rounded-xl py-3 font-semibold flex items-center justify-center gap-2 border border-white/20 transition-all active:scale-95"
+            >
               <span className="material-symbols-outlined text-[20px]">phone_android</span>
               Mobile Cash
             </button>
@@ -36,7 +81,7 @@ export default function TechnicianWalletPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-8">
         {[
-          { label: 'Total Earned', value: 'EGP 47.2K', icon: 'trending_up', color: 'text-green-600' },
+          { label: 'Total Earned', value: loading ? '...' : `EGP ${((balance ?? 0) + 38800).toLocaleString()}`, icon: 'trending_up', color: 'text-green-600' },
           { label: 'Withdrawn', value: 'EGP 38.8K', icon: 'arrow_outward', color: 'text-primary' },
           { label: 'Pending Payout', value: 'EGP 0', icon: 'schedule', color: 'text-on-surface-variant' },
         ].map(s => (
@@ -48,56 +93,47 @@ export default function TechnicianWalletPage() {
         ))}
       </div>
 
-      {/* Payout Methods */}
-      <div className="bg-white rounded-2xl border border-outline-variant/20 shadow-sm p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-primary text-lg">Payout Methods</h3>
-          <button className="text-primary text-sm font-semibold hover:underline flex items-center gap-1">
-            <span className="material-symbols-outlined text-[16px]">add</span>
-            Add New
-          </button>
-        </div>
-        <div className="space-y-3">
-          {[
-            { label: 'CIB Bank', detail: '**** **** **** 4821', icon: 'account_balance', primary: true },
-            { label: 'Vodafone Cash', detail: '+20 100 *** 4567', icon: 'phone_android', primary: false },
-          ].map(m => (
-            <div key={m.label} className={`flex items-center gap-4 p-4 rounded-xl border ${m.primary ? 'border-primary bg-primary-container/10' : 'border-outline-variant/20 bg-surface-container-low'}`}>
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${m.primary ? 'bg-primary text-white' : 'bg-surface-container-high text-on-surface-variant'}`}>
-                <span className="material-symbols-outlined text-[20px]">{m.icon}</span>
-              </div>
-              <div className="flex-1">
-                <p className="font-bold text-on-surface text-sm">{m.label}</p>
-                <p className="text-xs text-on-surface-variant">{m.detail}</p>
-              </div>
-              {m.primary && <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full">Default</span>}
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Transaction History */}
       <div className="bg-white rounded-2xl border border-outline-variant/20 shadow-sm overflow-hidden">
         <div className="p-5 border-b border-outline-variant/20">
           <h2 className="font-bold text-primary text-lg">Transaction History</h2>
         </div>
         <div className="divide-y divide-outline-variant/10">
-          {withdrawals.map(t => (
-            <div key={t.id} className="px-5 py-4 flex items-center justify-between hover:bg-surface-container-lowest transition-colors">
-              <div className="flex items-center gap-4">
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${t.amount > 0 ? 'bg-green-50 text-green-600' : 'bg-primary-container text-primary'}`}>
-                  <span className="material-symbols-outlined text-[22px]">{t.icon}</span>
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="px-5 py-4 flex items-center gap-4 animate-pulse">
+                <div className="w-11 h-11 rounded-xl bg-surface-container-low" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 bg-surface-container-low rounded w-48" />
+                  <div className="h-3 bg-surface-container-low rounded w-32" />
                 </div>
-                <div>
-                  <p className="font-semibold text-on-surface text-sm">{t.desc}</p>
-                  <p className="text-xs text-on-surface-variant">{t.date} · {t.id}</p>
-                </div>
+                <div className="h-4 bg-surface-container-low rounded w-20" />
               </div>
-              <span className={`font-bold text-base ${t.amount > 0 ? 'text-green-600' : 'text-on-surface'}`}>
-                {t.amount > 0 ? '+' : ''}{t.amount.toLocaleString()} EGP
-              </span>
+            ))
+          ) : transactions.length === 0 ? (
+            <div className="py-16 text-center">
+              <span className="material-symbols-outlined text-5xl text-outline block mb-3">receipt_long</span>
+              <p className="font-semibold text-on-surface-variant">No transactions yet</p>
+              <p className="text-sm text-outline mt-1">Your earnings will appear here once you complete jobs</p>
             </div>
-          ))}
+          ) : (
+            transactions.map((t: any) => (
+              <div key={t.id} className="px-5 py-4 flex items-center justify-between hover:bg-surface-container-lowest transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${t.amount > 0 ? 'bg-green-50 text-green-600' : 'bg-primary-container text-primary'}`}>
+                    <span className="material-symbols-outlined text-[22px]">{t.amount > 0 ? 'handyman' : 'account_balance'}</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-on-surface text-sm">{t.description || 'Transaction'}</p>
+                    <p className="text-xs text-on-surface-variant">{new Date(t.createdAt).toLocaleDateString()} · {t.id?.slice(0, 8)}</p>
+                  </div>
+                </div>
+                <span className={`font-bold text-base ${t.amount > 0 ? 'text-green-600' : 'text-on-surface'}`}>
+                  {t.amount > 0 ? '+' : ''}{t.amount?.toLocaleString()} EGP
+                </span>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

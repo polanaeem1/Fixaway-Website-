@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /how-it-works
+
+Disallow: /customer/
+Disallow: /technician/
+Disallow: /admin/
+Disallow: /dashboard
+
+Sitemap: https://fixaway.com/sitemap.xml

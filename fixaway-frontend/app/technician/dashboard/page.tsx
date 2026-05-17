@@ -28,12 +28,12 @@ export default function TechnicianDashboardPage() {
     todayTotal: 0
   });
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (lat = 30.0444, lng = 31.2357) => {
     if (!accessToken) return;
     try {
       const [walletRes, nearbyRes, earningsRes, ordersRes] = await Promise.allSettled([
         walletApi.getBalance(accessToken),
-        requestsApi.getNearby(accessToken, 30.0444, 31.2357),
+        requestsApi.getNearby(accessToken, lat, lng),
         walletApi.getEarnings(accessToken),
         ordersApi.getMyOrders(accessToken)
       ]);
@@ -46,12 +46,25 @@ export default function TechnicianDashboardPage() {
       if (ordersRes.status === 'fulfilled' && ordersRes.value.data) {
         setActiveOrders(ordersRes.value.data.orders.filter((o: any) => ['CONFIRMED', 'TECHNICIAN_EN_ROUTE', 'IN_PROGRESS'].includes(o.status)));
       }
-    } catch (error) {
-      console.error('Failed to fetch data', error);
+    } catch {
+      // silently fail — data is optional
     } finally {
       setLoading(false);
     }
   }, [accessToken]);
+
+  // On mount, resolve real GPS position then fetch nearby requests
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => fetchData(pos.coords.latitude, pos.coords.longitude),
+        () => fetchData() // fallback to default coords if denied
+      );
+    } else {
+      fetchData();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     fetchData();

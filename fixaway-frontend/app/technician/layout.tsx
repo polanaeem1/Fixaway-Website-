@@ -4,6 +4,7 @@ import { ReactNode, useState } from 'react';
 import AuthGuard from '@/components/auth/AuthGuard';
 import { useAuthStore } from '@/store/auth.store';
 import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useToast } from '@/components/ui/ToastProvider';
 import NotificationDropdown from '@/components/layout/NotificationDropdown';
 import { technicianApi } from '@/lib/api';
@@ -20,6 +21,7 @@ function SupportChatButton() {
 export default function TechnicianLayout({ children }: { children: ReactNode }) {
   const { user, clearAuth, accessToken } = useAuthStore();
   const router = useRouter();
+  const pathname = usePathname();
   const [isOnline, setIsOnline] = useState(true);
   const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
@@ -99,29 +101,29 @@ export default function TechnicianLayout({ children }: { children: ReactNode }) 
         <div className="mb-lg p-md bg-primary-container/5 rounded-xl border border-primary/10">
           <h3 className="font-h2 text-h2 text-primary mb-1 truncate">{user?.name || 'Technician'}</h3>
           <p className="font-body-md text-on-surface-variant opacity-70 truncate">{user?.email?.split('@')[0]}</p>
-          <button className="mt-md w-full bg-secondary-container text-on-secondary-container font-label-caps py-2 rounded-lg hover:bg-secondary transition-all duration-300">Upgrade to Gold</button>
-          <button onClick={handleLogout} className="mt-2 w-full flex items-center justify-center gap-2 py-sm text-sm text-error hover:bg-error/10 rounded-lg transition-colors">
+          <button onClick={handleLogout} className="mt-md w-full flex items-center justify-center gap-2 py-sm text-sm text-error hover:bg-error/10 rounded-lg transition-colors">
             <span className="material-symbols-outlined text-[18px]">logout</span>
             Sign Out
           </button>
         </div>
         <nav className="flex flex-col gap-2">
-          <Link href="/technician/dashboard" className="flex items-center gap-md p-md bg-primary-container text-on-primary-container rounded-lg transition-all duration-300">
-            <span className="material-symbols-outlined">home</span>
-            <span className="font-body-md text-body-md">Home</span>
-          </Link>
-          <Link href="/technician/requests" className="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300">
-            <span className="material-symbols-outlined">history</span>
-            <span className="font-body-md text-body-md">My Requests</span>
-          </Link>
-          <Link href="/technician/wallet" className="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300">
-            <span className="material-symbols-outlined">account_balance_wallet</span>
-            <span className="font-body-md text-body-md">Wallet</span>
-          </Link>
-          <Link href="/technician/settings" className="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300">
-            <span className="material-symbols-outlined">settings</span>
-            <span className="font-body-md text-body-md">Settings</span>
-          </Link>
+          {[
+            { href: '/technician/dashboard', icon: 'home', label: 'Home' },
+            { href: '/technician/requests', icon: 'history', label: 'My Requests' },
+            { href: '/technician/wallet', icon: 'account_balance_wallet', label: 'Wallet' },
+            { href: '/technician/profile', icon: 'person', label: 'Profile' },
+            { href: '/technician/settings', icon: 'settings', label: 'Settings' },
+          ].map(({ href, icon, label }) => {
+            const isActive = pathname === href;
+            return (
+              <Link key={href} href={href} className={`flex items-center gap-md p-md rounded-lg transition-all duration-300 ${
+                isActive ? 'bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant hover:bg-surface-container-high'
+              }`}>
+                <span className="material-symbols-outlined">{icon}</span>
+                <span className="font-body-md text-body-md">{label}</span>
+              </Link>
+            );
+          })}
         </nav>
       </aside>
 

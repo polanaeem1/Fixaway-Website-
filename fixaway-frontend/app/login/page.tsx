@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore, Role } from '@/store/auth.store';
 import { authApi, ApiError } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,7 +12,7 @@ const roleRedirects: Record<Role, string> = {
   ADMIN: '/admin/dashboard',
 };
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const { setAuth, isAuthenticated, user } = useAuthStore();
 
@@ -37,11 +37,14 @@ export default function LoginPage() {
   };
 
   // Redirect already-logged-in users to their dashboard
+  const searchParams = useSearchParams();
+
   useEffect(() => {
     if (isAuthenticated && user) {
-      router.replace(roleRedirects[user.role as Role] || '/customer/dashboard');
+      const next = searchParams.get('next');
+      router.replace(next || roleRedirects[user.role as Role] || '/customer/dashboard');
     }
-  }, [isAuthenticated, user, router]);
+  }, [isAuthenticated, user, router, searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +59,8 @@ export default function LoginPage() {
       const res = await authApi.login(email, password);
       const { user, accessToken, refreshToken } = res.data;
       setAuth(user, accessToken, refreshToken);
-      router.push(roleRedirects[user.role as Role] || '/customer/dashboard');
+      const next = searchParams.get('next');
+      router.push(next || roleRedirects[user.role as Role] || '/customer/dashboard');
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message);
@@ -194,5 +198,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-surface">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }

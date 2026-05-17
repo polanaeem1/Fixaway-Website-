@@ -236,6 +236,18 @@ export default function LandingPage() {
         <span className="material-symbols-outlined text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>emergency_share</span>
         <span className="absolute -top-12 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] px-sm py-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">SOS HELP</span>
       </Link>
+
+      {/* Footer */}
+      <footer className="border-t border-outline-variant/20 py-8 px-gutter bg-surface">
+        <div className="max-w-container-max mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-on-surface-variant">
+          <p>© {new Date().getFullYear()} Fixaway. All rights reserved.</p>
+          <div className="flex gap-6">
+            <Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>
+            <Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+            <a href="mailto:support@fixaway.com" className="hover:text-primary transition-colors">Contact</a>
+          </div>
+        </div>
+      </footer>
     </>
   );
 }

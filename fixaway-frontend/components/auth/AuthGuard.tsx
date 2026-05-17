@@ -17,8 +17,8 @@ export default function AuthGuard({ children, requiredRole }: Props) {
   // Sync state and live data
   useEffect(() => {
     setIsMounted(true);
-    
-    if (isAuthenticated && accessToken && accessToken !== 'demo-token') {
+
+    if (isAuthenticated && accessToken) {
       authApi.getMe(accessToken)
         .then(res => {
           if (res.data) updateUser(res.data);
@@ -36,7 +36,10 @@ export default function AuthGuard({ children, requiredRole }: Props) {
     if (!isMounted) return;
 
     if (!isAuthenticated) {
-      router.replace('/login');
+      // Preserve destination for post-login redirect
+      const next = typeof window !== 'undefined' ? window.location.pathname : '';
+      const redirectPath = next && next !== '/login' ? `/login?next=${encodeURIComponent(next)}` : '/login';
+      router.replace(redirectPath);
       return;
     }
 
@@ -50,7 +53,16 @@ export default function AuthGuard({ children, requiredRole }: Props) {
     }
   }, [isMounted, isAuthenticated, user, requiredRole, router]);
 
-  if (!isMounted) return null;
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-on-surface-variant text-sm font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
   if (!isAuthenticated) return null;
   if (requiredRole && user?.role !== requiredRole) return null;
 
