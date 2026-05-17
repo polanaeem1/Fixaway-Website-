@@ -1,0 +1,258 @@
+// Fixaway Platform - Prisma Schema
+// PostgreSQL Database
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  CUSTOMER
+  TECHNICIAN
+  ADMIN
+}
+
+enum RequestStatus {
+  PENDING
+  QUOTED
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum OrderStatus {
+  CONFIRMED
+  TECHNICIAN_EN_ROUTE
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+enum QuotationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+}
+
+enum ServiceType {
+  HOME
+  ROADSIDE
+}
+
+enum SubscriptionTier {
+  BASIC
+  GOLD
+  PLATINUM
+}
+
+enum FraudAlertType {
+  LOCATION_MISMATCH
+  DOUBLE_BILLING
+  FAKE_COMPLETION
+  SUSPICIOUS_ACTIVITY
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  phone        String?  @unique
+  passwordHash String
+  role         Role     @default(CUSTOMER)
+  avatarUrl    String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  technicianProfile  TechnicianProfile?
+  serviceRequests    ServiceRequest[]    @relation("CustomerRequests")
+  customerOrders     Order[]             @relation("CustomerOrders")
+  technicianOrders   Order[]             @relation("TechnicianOrders")
+  quotations         Quotation[]
+  reviewsGiven       Review[]            @relation("ReviewsGiven")
+  reviewsReceived    Review[]            @relation("ReviewsReceived")
+  walletTransactions WalletTransaction[]
+  notifications      Notification[]
+  sentMessages       ChatMessage[]
+
+  @@map("users")
+}
+
+model TechnicianProfile {
+  id               String           @id @default(cuid())
+  userId           String           @unique
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isVerified       Boolean          @default(false)
+  isOnline         Boolean          @default(false)
+  lat              Float?
+  lng              Float?
+  bio              String?
+  specialties      String[]
+  idDocUrl         String?
+  certDocUrl       String?
+  rating           Float            @default(0)
+  totalJobs        Int              @default(0)
+  subscriptionTier SubscriptionTier @default(BASIC)
+  walletBalance    Float            @default(0)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@map("technician_profiles")
+}
+
+model Category {
+  id       String           @id @default(cuid())
+  name     String
+  icon     String
+  type     ServiceType
+  requests ServiceRequest[]
+
+  @@map("categories")
+}
+
+model ServiceRequest {
+  id          String        @id @default(cuid())
+  customerId  String
+  customer    User          @relation("CustomerRequests", fields: [customerId], references: [id])
+  categoryId  String?
+  category    Category?     @relation(fields: [categoryId], references: [id])
+  type        ServiceType   @default(HOME)
+  title       String
+  description String
+  mediaUrls   String[]
+  lat         Float?
+  lng         Float?
+  address     String?
+  status      RequestStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  quotations Quotation[]
+  order      Order?
+
+  @@map("service_requests")
+}
+
+model Quotation {
+  id           String          @id @default(cuid())
+  requestId    String
+  request      ServiceRequest  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  technicianId String
+  technician   User            @relation(fields: [technicianId], references: [id])
+  price        Float
+  note         String?
+  eta          Int?            // Estimated time in minutes
+  status       QuotationStatus @default(PENDING)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  order Order?
+
+  @@map("quotations")
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  requestId    String      @unique
+  request      ServiceRequest @relation(fields: [requestId], references: [id])
+  quotationId  String      @unique
+  quotation    Quotation   @relation(fields: [quotationId], references: [id])
+  customerId   String
+  customer     User        @relation("CustomerOrders", fields: [customerId], references: [id])
+  technicianId String
+  technician   User        @relation("TechnicianOrders", fields: [technicianId], references: [id])
+  status       OrderStatus @default(CONFIRMED)
+  totalAmount  Float
+  startedAt    DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  messages     ChatMessage[]
+  reviews      Review[]
+  transactions WalletTransaction[]
+  fraudAlerts  FraudAlert[]
+
+  @@map("orders")
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User     @relation(fields: [senderId], references: [id])
+  content   String
+  mediaUrl  String?
+  createdAt DateTime @default(now())
+
+  @@map("chat_messages")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  raterId   String
+  rater     User     @relation("ReviewsGiven", fields: [raterId], references: [id])
+  ratedId   String
+  rated     User     @relation("ReviewsReceived", fields: [ratedId], references: [id])
+  rating    Int      // 1-5
+  comment   String?
+  createdAt DateTime @default(now())
+
+  @@map("reviews")
+}
+
+model WalletTransaction {
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+  orderId     String?
+  order       Order?          @relation(fields: [orderId], references: [id])
+  type        TransactionType
+  amount      Float
+  description String
+  createdAt   DateTime        @default(now())
+
+  @@map("wallet_transactions")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  type      String   // REQUEST_NEW, QUOTATION_RECEIVED, ORDER_UPDATE, etc.
+  isRead    Boolean  @default(false)
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
+
+model FraudAlert {
+  id          String         @id @default(cuid())
+  orderId     String?
+  order       Order?         @relation(fields: [orderId], references: [id])
+  type        FraudAlertType
+  description String
+  resolvedAt  DateTime?
+  createdAt   DateTime       @default(now())
+
+  @@map("fraud_alerts")
+}
