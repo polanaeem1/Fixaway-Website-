@@ -93,11 +93,11 @@ export default function AdminOrdersPage() {
               <tbody className="divide-y divide-outline-variant/10">
                 {filtered.map((o: any) => (
                   <tr key={o.id} className="hover:bg-surface-container-lowest transition-colors">
-                    <td className="px-5 py-4 font-mono text-xs text-on-surface-variant">{o.id}</td>
-                    <td className="px-5 py-4 font-semibold text-on-surface">{o.serviceType}</td>
-                    <td className="px-5 py-4 text-on-surface-variant">{o.customerName ?? o.customer?.name ?? '—'}</td>
-                    <td className="px-5 py-4 text-on-surface-variant">{o.technicianName ?? o.technician?.name ?? 'Pending'}</td>
-                    <td className="px-5 py-4 font-bold text-primary">{o.totalPrice ? `EGP ${o.totalPrice}` : 'TBD'}</td>
+                    <td className="px-5 py-4 font-mono text-xs text-on-surface-variant">{o.id.slice(-8)}</td>
+                    <td className="px-5 py-4 font-semibold text-on-surface">{o.request?.category?.name || o.request?.type || o.serviceType || 'Service'}</td>
+                    <td className="px-5 py-4 text-on-surface-variant">{o.customer?.name ?? o.customerName ?? '—'}</td>
+                    <td className="px-5 py-4 text-on-surface-variant">{o.technician?.name ?? o.technicianName ?? 'Pending'}</td>
+                    <td className="px-5 py-4 font-bold text-primary">{o.totalAmount || o.totalPrice ? `EGP ${o.totalAmount || o.totalPrice}` : 'TBD'}</td>
                     <td className="px-5 py-4 text-on-surface-variant">{new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
                     <td className="px-5 py-4">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${statusColor[o.status] ?? 'bg-surface-container text-on-surface'}`}>

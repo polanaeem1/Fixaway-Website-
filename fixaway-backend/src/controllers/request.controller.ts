@@ -43,7 +43,7 @@ export const getMyRequests = async (req: any, res: Response) => {
       include: {
         category: true,
         quotations: { include: { technician: { select: { id: true, name: true, avatarUrl: true } } } },
-        order: true,
+        order: { include: { reviews: true, technician: { select: { id: true, name: true } } } },
       },
       skip: (Number(page) - 1) * Number(limit),
       take: Number(limit),

@@ -16,7 +16,18 @@ export default function AdminTechniciansPage() {
       try {
         if (accessToken) {
           const res = await adminApi.getTechnicians(accessToken);
-          setTechs(Array.isArray(res.data) ? res.data : []);
+          const rawTechs = Array.isArray(res.data) ? res.data : (res.data as any)?.technicians || [];
+          
+          const mapped = rawTechs.map((t: any) => ({
+            id: t.userId, // use userId because /verify needs userId
+            name: t.user?.name || 'Unknown',
+            specialties: t.specialties,
+            rating: t.rating,
+            completedJobs: t.totalJobs,
+            isOnline: t.isOnline,
+            verificationStatus: t.isVerified ? 'VERIFIED' : 'PENDING',
+          }));
+          setTechs(mapped);
         }
       } catch (e) { console.error('Failed to load technicians', e); }
       finally { setLoading(false); }

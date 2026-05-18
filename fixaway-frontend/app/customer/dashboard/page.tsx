@@ -157,9 +157,14 @@ export default function CustomerDashboardPage() {
               <div className="flex justify-between mt-1.5 text-xs text-on-surface-variant">
                 <span>Technician en route</span><span>~12 min away</span>
               </div>
-              <Link href="/customer/requests" className="mt-4 flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
-                <span className="material-symbols-outlined text-[18px]">location_on</span> Track Live
-              </Link>
+              <div className="flex items-center gap-4 mt-4">
+                <Link href={`/chat/${activeOrder.id}`} className="flex-1 flex items-center justify-center gap-1.5 bg-primary text-white py-2 rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all active:scale-95 shadow-sm shadow-primary/20">
+                  <span className="material-symbols-outlined text-[18px]">forum</span> Chat
+                </Link>
+                <Link href="/customer/requests" className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+                  <span className="material-symbols-outlined text-[18px]">location_on</span> Track Live
+                </Link>
+              </div>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center gap-4 py-4">

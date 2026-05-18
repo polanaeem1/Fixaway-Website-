@@ -1,9 +1,10 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
 import { useAuthStore } from '@/store/auth.store';
-import { requestsApi, quotationsApi, reviewsApi } from '@/lib/api';
+import { requestsApi, quotationsApi } from '@/lib/api';
 import { getSocket } from '@/lib/socket';
 import { useToast } from '@/components/ui/ToastProvider';
+import ReviewModal from '@/components/ui/ReviewModal';
 
 const statusColors: Record<string, string> = {
   COMPLETED: 'bg-green-100 text-green-700',
@@ -19,8 +20,7 @@ export default function CustomerRequestsPage() {
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAccepting, setIsAccepting] = useState<Record<string, boolean>>({});
-  const [reviewModal, setReviewModal] = useState<{ orderId: string; techName: string; rating: number; comment: string } | null>(null);
-  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [reviewModalData, setReviewModalData] = useState<{ orderId: string; techName: string } | null>(null);
 
   const fetchData = useCallback(async () => {
     if (!accessToken) return;
@@ -64,20 +64,7 @@ export default function CustomerRequestsPage() {
     }
   };
 
-  const handleSubmitReview = async () => {
-    if (!accessToken || !reviewModal) return;
-    if (reviewModal.rating === 0) { showToast('Please select a star rating', 'error'); return; }
-    setIsSubmittingReview(true);
-    try {
-      await reviewsApi.submit(accessToken, reviewModal.orderId, reviewModal.rating, reviewModal.comment);
-      showToast('Review submitted! Thank you for your feedback.', 'success');
-      setReviewModal(null);
-    } catch (err: any) {
-      showToast(err.message || 'Failed to submit review', 'error');
-    } finally {
-      setIsSubmittingReview(false);
-    }
-  };
+
 
   const total = requests.length;
   const completed = requests.filter(r => r.status === 'COMPLETED').length;
@@ -160,9 +147,9 @@ export default function CustomerRequestsPage() {
                           <span className="material-symbols-outlined text-[14px]">check_circle</span>
                           {isAccepting[r.quotations[0].id] ? '...' : `Accept EGP ${r.quotations[0].price}`}
                         </button>
-                      ) : r.status === 'COMPLETED' && r.order ? (
+                      ) : r.status === 'COMPLETED' && r.order && (!r.order.reviews || r.order.reviews.length === 0) ? (
                         <button
-                          onClick={() => setReviewModal({ orderId: r.order.id, techName: r.order?.technician?.name || 'Technician', rating: 0, comment: '' })}
+                          onClick={() => setReviewModalData({ orderId: r.order.id, techName: r.order?.technician?.name || 'Technician' })}
                           className="border border-secondary text-secondary px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-secondary/5 transition-all flex items-center gap-1 whitespace-nowrap"
                         >
                           <span className="material-symbols-outlined text-[14px]">star</span>
@@ -181,67 +168,16 @@ export default function CustomerRequestsPage() {
       </div>
 
       {/* Review Modal */}
-      {reviewModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
-            <div className="p-5 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-lowest">
-              <h2 className="font-bold text-primary text-lg">Rate Your Experience</h2>
-              <button onClick={() => setReviewModal(null)} className="text-on-surface-variant hover:text-error transition-colors">
-                <span className="material-symbols-outlined">close</span>
-              </button>
-            </div>
-            <div className="p-6 space-y-5">
-              <div className="text-center">
-                <p className="text-sm text-on-surface-variant mb-1">How was your experience with</p>
-                <p className="font-bold text-primary text-lg">{reviewModal.techName}?</p>
-              </div>
-              {/* Star Rating */}
-              <div className="flex justify-center gap-2">
-                {[1, 2, 3, 4, 5].map(star => (
-                  <button
-                    key={star}
-                    onClick={() => setReviewModal(prev => prev ? { ...prev, rating: star } : null)}
-                    className="transition-transform hover:scale-110 active:scale-95"
-                  >
-                    <span
-                      className={`material-symbols-outlined text-4xl transition-colors ${star <= reviewModal.rating ? 'text-yellow-400' : 'text-outline-variant'}`}
-                      style={{ fontVariationSettings: star <= reviewModal.rating ? "'FILL' 1" : "'FILL' 0" }}
-                    >
-                      star
-                    </span>
-                  </button>
-                ))}
-              </div>
-              {reviewModal.rating > 0 && (
-                <p className="text-center text-sm font-semibold text-on-surface-variant">
-                  {['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent!'][reviewModal.rating]}
-                </p>
-              )}
-              <div>
-                <label className="text-xs font-bold text-on-surface-variant uppercase mb-2 block">Comment (optional)</label>
-                <textarea
-                  value={reviewModal.comment}
-                  onChange={e => setReviewModal(prev => prev ? { ...prev, comment: e.target.value } : null)}
-                  placeholder="Share details about your experience..."
-                  className="w-full px-4 py-3 border border-outline-variant/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary bg-surface-container-low resize-none min-h-[80px] text-sm"
-                />
-              </div>
-            </div>
-            <div className="p-5 border-t border-outline-variant/10 bg-surface-container-lowest flex gap-3">
-              <button onClick={() => setReviewModal(null)} className="flex-1 py-3 text-sm font-semibold text-primary border border-primary/20 rounded-xl hover:bg-primary/5 transition-colors">Cancel</button>
-              <button
-                onClick={handleSubmitReview}
-                disabled={isSubmittingReview || reviewModal.rating === 0}
-                className="flex-1 py-3 text-sm font-semibold bg-yellow-400 text-yellow-900 rounded-xl hover:opacity-90 transition-opacity shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {isSubmittingReview
-                  ? <><span className="w-4 h-4 border-2 border-yellow-900/30 border-t-yellow-900 rounded-full animate-spin" /> Submitting...</>
-                  : <><span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span> Submit Review</>
-                }
-              </button>
-            </div>
-          </div>
-        </div>
+      {reviewModalData && (
+        <ReviewModal
+          orderId={reviewModalData.orderId}
+          technicianName={reviewModalData.techName}
+          onClose={() => setReviewModalData(null)}
+          onSuccess={() => {
+            setReviewModalData(null);
+            fetchData();
+          }}
+        />
       )}
     </div>
   );

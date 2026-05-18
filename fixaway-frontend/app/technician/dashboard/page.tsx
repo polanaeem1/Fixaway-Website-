@@ -226,9 +226,14 @@ export default function TechnicianDashboardPage() {
                 </div>
               </div>
               {activeOrders.length > 0 ? (
-                <button onClick={() => handleCompleteJob(activeOrders[0].id)} disabled={isCompleting} className="bg-primary text-white px-4 py-2 rounded-xl flex items-center gap-1.5 text-sm font-semibold hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-50">
-                  <span className="material-symbols-outlined text-[18px]">check_circle</span> {isCompleting ? '...' : 'Complete Job'}
-                </button>
+                <div className="flex gap-2">
+                  <Link href={`/chat/${activeOrders[0].id}`} className="bg-primary-container text-primary px-4 py-2 rounded-xl flex items-center gap-1.5 text-sm font-semibold hover:bg-primary-container/80 transition-all active:scale-95 border border-primary/20">
+                    <span className="material-symbols-outlined text-[18px]">forum</span> Chat
+                  </Link>
+                  <button onClick={() => handleCompleteJob(activeOrders[0].id)} disabled={isCompleting} className="bg-primary text-white px-4 py-2 rounded-xl flex items-center gap-1.5 text-sm font-semibold hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-50">
+                    <span className="material-symbols-outlined text-[18px]">check_circle</span> {isCompleting ? '...' : 'Complete Job'}
+                  </button>
+                </div>
               ) : (
                 <button disabled className="bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-xl flex items-center gap-1.5 text-sm font-semibold opacity-50">
                   <span className="material-symbols-outlined text-[18px]">navigation</span> Navigate

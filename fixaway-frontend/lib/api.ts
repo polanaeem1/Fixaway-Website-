@@ -238,4 +238,17 @@ export const reviewsApi = {
     }),
 };
 
+// ─── Chat ──────────────────────────────────────────────────────────────────────
+export const chatApi = {
+  getMessages: (token: string, orderId: string) =>
+    request<{ success: boolean; data: any[] }>(`/chat/${orderId}`, { token }),
+
+  sendMessage: (token: string, orderId: string, content: string) =>
+    request<{ success: boolean; data: any }>(`/chat/${orderId}`, {
+      method: 'POST',
+      token,
+      body: JSON.stringify({ content }),
+    }),
+};
+
 export { ApiError };

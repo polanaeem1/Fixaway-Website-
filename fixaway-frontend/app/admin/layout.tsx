@@ -13,38 +13,38 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
         <nav className="flex-1 py-lg px-sm space-y-sm overflow-y-auto">
           <div className="px-md mb-xs text-[10px] uppercase font-bold text-white/50 tracking-wider">Main</div>
-          <Link href="/dashboard" className="flex items-center gap-md px-md py-sm rounded-lg bg-white/10 border-l-4 border-secondary-container">
+          <Link href="/admin/dashboard" className="flex items-center gap-md px-md py-sm rounded-lg bg-white/10 border-l-4 border-secondary-container">
             <span className="material-symbols-outlined text-[20px]">dashboard</span>
             <span>Dashboard</span>
           </Link>
-          <Link href="/analytics" className="flex items-center gap-md px-md py-sm rounded-lg hover:bg-white/5 transition-colors">
+          <Link href="/admin/analytics" className="flex items-center gap-md px-md py-sm rounded-lg hover:bg-white/5 transition-colors">
             <span className="material-symbols-outlined text-[20px]">analytics</span>
             <span>Analytics</span>
           </Link>
-          <Link href="/map" className="flex items-center gap-md px-md py-sm rounded-lg hover:bg-white/5 transition-colors">
+          <Link href="/admin/map" className="flex items-center gap-md px-md py-sm rounded-lg hover:bg-white/5 transition-colors">
             <span className="material-symbols-outlined text-[20px]">map</span>
             <span>Live Map</span>
           </Link>
 
           <div className="px-md mt-lg mb-xs text-[10px] uppercase font-bold text-white/50 tracking-wider">Management</div>
-          <Link href="/users" className="flex items-center gap-md px-md py-sm rounded-lg hover:bg-white/5 transition-colors">
+          <Link href="/admin/users" className="flex items-center gap-md px-md py-sm rounded-lg hover:bg-white/5 transition-colors">
             <span className="material-symbols-outlined text-[20px]">group</span>
             <span>Users</span>
           </Link>
-          <Link href="/technicians" className="flex items-center justify-between px-md py-sm rounded-lg hover:bg-white/5 transition-colors group">
+          <Link href="/admin/technicians" className="flex items-center justify-between px-md py-sm rounded-lg hover:bg-white/5 transition-colors group">
             <div className="flex items-center gap-md">
               <span className="material-symbols-outlined text-[20px]">engineering</span>
               <span>Technicians</span>
             </div>
-            <span className="bg-error text-white text-[10px] px-2 py-0.5 rounded-full font-bold">12</span>
+            <span className="bg-error text-white text-[10px] px-2 py-0.5 rounded-full font-bold">New</span>
           </Link>
-          <Link href="/orders" className="flex items-center gap-md px-md py-sm rounded-lg hover:bg-white/5 transition-colors">
+          <Link href="/admin/orders" className="flex items-center gap-md px-md py-sm rounded-lg hover:bg-white/5 transition-colors">
             <span className="material-symbols-outlined text-[20px]">receipt_long</span>
             <span>Orders</span>
           </Link>
           
           <div className="px-md mt-lg mb-xs text-[10px] uppercase font-bold text-white/50 tracking-wider">Security</div>
-          <Link href="/fraud" className="flex items-center justify-between px-md py-sm rounded-lg hover:bg-white/5 transition-colors text-error-container">
+          <Link href="/admin/fraud" className="flex items-center justify-between px-md py-sm rounded-lg hover:bg-white/5 transition-colors text-error-container">
             <div className="flex items-center gap-md">
               <span className="material-symbols-outlined text-[20px]">security</span>
               <span>Fraud Alerts</span>

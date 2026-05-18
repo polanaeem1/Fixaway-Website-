@@ -14,12 +14,12 @@ if (!admin.apps.length) {
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
       });
-      console.log('🔥 Firebase Admin initialized successfully!');
+      console.log('Firebase Admin initialized successfully!');
     } else {
-      console.warn('⚠️ Firebase Admin SDK config not found at', serviceAccountPath);
+      console.warn('Firebase Admin SDK config not found at', serviceAccountPath);
     }
   } catch (error) {
-    console.error('❌ Error initializing Firebase Admin:', error);
+    console.error('Error initializing Firebase Admin:', error);
   }
 }
 

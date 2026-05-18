@@ -70,9 +70,9 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 4000;
 
 httpServer.listen(PORT, () => {
-  console.log(`\n🚀 Fixaway API running on http://localhost:${PORT}`);
-  console.log(`📡 Socket.io ready`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}\n`);
+  console.log(`\n Fixaway API running on http://localhost:${PORT}`);
+  console.log(` Socket.io ready`);
+  console.log(` Environment: ${process.env.NODE_ENV || 'development'}\n`);
 });
 
 export { io };
