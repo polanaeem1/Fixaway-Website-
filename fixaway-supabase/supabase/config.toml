@@ -52,3 +52,36 @@ inspector_port = 8083
 
 [analytics]
 enabled = false
+
+[functions.auth]
+verify_jwt = false
+
+[functions.technicians]
+verify_jwt = false
+
+[functions.requests]
+verify_jwt = false
+
+[functions.quotations]
+verify_jwt = false
+
+[functions.orders]
+verify_jwt = false
+
+[functions.chat]
+verify_jwt = false
+
+[functions.wallet]
+verify_jwt = false
+
+[functions.admin]
+verify_jwt = false
+
+[functions.upload]
+verify_jwt = false
+
+[functions.notifications]
+verify_jwt = false
+
+[functions.reviews]
+verify_jwt = false
