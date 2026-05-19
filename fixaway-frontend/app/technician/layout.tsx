@@ -114,7 +114,7 @@ export default function TechnicianLayout({ children }: { children: ReactNode }) 
             { href: '/technician/profile', icon: 'person', label: 'Profile' },
             { href: '/technician/settings', icon: 'settings', label: 'Settings' },
           ].map(({ href, icon, label }) => {
-            const isActive = pathname === href;
+            const isActive = pathname === href || pathname.startsWith(href + '/');
             return (
               <Link key={href} href={href} className={`flex items-center gap-md p-md rounded-lg transition-all duration-300 ${
                 isActive ? 'bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant hover:bg-surface-container-high'
@@ -132,23 +132,32 @@ export default function TechnicianLayout({ children }: { children: ReactNode }) 
         {children}
       </div>
 
-      <nav className="md:hidden fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-lg flex justify-around items-end pb-4 px-2 z-50 rounded-t-xl border-t border-white/50 shadow-[0px_-4px_20px_rgba(26,54,93,0.05)]">
-        <Link href="/technician/dashboard" className="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full w-12 h-12 mb-2 active:scale-90 transition-transform">
-          <span className="material-symbols-outlined">explore</span>
-          <span className="hidden font-label-caps text-label-caps">Explore</span>
-        </Link>
-        <Link href="/technician/requests" className="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-90 transition-transform">
-          <span className="material-symbols-outlined">assignment</span>
-          <span className="font-label-caps text-label-caps mt-1">Requests</span>
-        </Link>
-        <Link href="/technician/wallet" className="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-90 transition-transform">
-          <span className="material-symbols-outlined">account_balance_wallet</span>
-          <span className="font-label-caps text-label-caps mt-1">Wallet</span>
-        </Link>
-        <Link href="/technician/settings" className="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-90 transition-transform">
-          <span className="material-symbols-outlined">settings</span>
-          <span className="font-label-caps text-label-caps mt-1">Settings</span>
-        </Link>
+      <nav className="md:hidden fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-lg flex justify-around items-center py-2 px-2 z-50 rounded-t-xl border-t border-white/50 shadow-[0px_-4px_20px_rgba(26,54,93,0.05)]">
+        {[
+          { href: '/technician/dashboard', icon: 'home', label: 'Home' },
+          { href: '/technician/requests', icon: 'assignment', label: 'Requests' },
+          { href: '/technician/wallet', icon: 'account_balance_wallet', label: 'Wallet' },
+          { href: '/technician/profile', icon: 'person', label: 'Profile' },
+          { href: '/technician/settings', icon: 'settings', label: 'Settings' },
+        ].map((item) => {
+          const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 ${
+                isActive
+                  ? 'text-primary font-bold'
+                  : 'text-on-surface-variant hover:text-primary/70'
+              }`}
+            >
+              <span className={`material-symbols-outlined text-2xl ${isActive ? 'scale-110' : ''}`} style={{ fontVariationSettings: isActive ? "'FILL' 1" : "" }}>
+                {item.icon}
+              </span>
+              <span className="text-[10px] tracking-wide mt-0.5">{item.label}</span>
+            </Link>
+          );
+        })}
       </nav>
 
       {/* Emergency FAB */}

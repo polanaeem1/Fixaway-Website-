@@ -10,15 +10,15 @@ export default function TechnicianProfilePage() {
       {/* Profile Header */}
       <div className="bg-primary rounded-3xl p-8 text-white relative overflow-hidden shadow-xl shadow-primary/20">
         <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/5 rounded-full" />
-        <div className="relative z-10 flex items-center gap-6">
-          <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-white text-4xl font-bold border-2 border-white/30">
+        <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6">
+          <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-white text-4xl font-bold border-2 border-white/30 flex-shrink-0">
             {user?.name?.charAt(0).toUpperCase() || 'T'}
           </div>
           <div>
             <h1 className="text-2xl font-bold">{user?.name || 'Technician'}</h1>
             <p className="text-white/70 text-sm mt-1">{user?.email}</p>
             <p className="text-white/70 text-sm">{user?.phone || 'No phone set'}</p>
-            <div className="flex items-center gap-1 mt-2">
+            <div className="flex items-center justify-center sm:justify-start gap-1 mt-2">
               {[1, 2, 3, 4, 5].map(s => (
                 <span key={s} className="material-symbols-outlined text-yellow-300 text-[18px]" style={{ fontVariationSettings: `'FILL' 1` }}>star</span>
               ))}
@@ -44,13 +44,13 @@ export default function TechnicianProfilePage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { label: 'Jobs Done', value: '0', icon: 'handyman' },
           { label: 'Rating', value: '—', icon: 'star' },
           { label: 'Response Rate', value: '—', icon: 'timer' },
         ].map(s => (
-          <div key={s.label} className="bg-white rounded-2xl border border-outline-variant/20 shadow-sm p-5 text-center">
+          <div key={s.label} className="bg-white rounded-2xl border border-outline-variant/20 shadow-sm p-5 text-center flex flex-col items-center justify-center">
             <span className="material-symbols-outlined text-primary text-3xl block mb-1" style={{ fontVariationSettings: "'FILL' 1" }}>{s.icon}</span>
             <p className="font-bold text-primary text-xl">{s.value}</p>
             <p className="text-xs text-on-surface-variant mt-1">{s.label}</p>

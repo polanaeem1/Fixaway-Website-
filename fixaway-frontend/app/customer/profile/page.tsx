@@ -64,8 +64,8 @@ export default function CustomerProfilePage() {
             </div>
           )}
         </div>
-        <div className="pt-16 pb-6 px-8">
-          <div className="flex items-start justify-between">
+        <div className="pt-16 pb-6 px-6 sm:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div>
               <h2 className="text-2xl font-bold text-primary">{user?.name || 'Customer'}</h2>
               <p className="text-on-surface-variant mt-1">{user?.email}</p>
@@ -76,7 +76,7 @@ export default function CustomerProfilePage() {
                 </span>
               </div>
             </div>
-            <div className="text-right">
+            <div className="text-left sm:text-right">
               <p className="text-xs text-on-surface-variant">Account Role</p>
               <p className="font-bold text-primary">Customer</p>
             </div>

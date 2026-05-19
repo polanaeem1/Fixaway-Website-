@@ -79,9 +79,9 @@ export default function AdminMapPage() {
   }, [accessToken]);
 
   return (
-    <div className="h-[calc(100vh-8rem)] flex gap-6">
+    <div className="h-[calc(100vh-8rem)] flex flex-col lg:flex-row gap-6">
       {/* Map Panel */}
-      <div className="flex-1 bg-surface-container-low rounded-2xl overflow-hidden relative border border-outline-variant/20 shadow-sm">
+      <div className="flex-1 min-h-[350px] lg:min-h-0 bg-surface-container-low rounded-2xl overflow-hidden relative border border-outline-variant/20 shadow-sm">
         {loading ? (
           <div className="w-full h-full bg-surface-container flex items-center justify-center animate-pulse">
             <span className="text-on-surface-variant text-sm font-semibold">Locating Technicians...</span>
@@ -91,7 +91,7 @@ export default function AdminMapPage() {
         )}
 
         {/* Top Overlay Controls */}
-        <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10 pointer-events-none">
+        <div className="absolute top-4 left-4 right-4 flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between z-10 pointer-events-none">
           <div className="bg-white/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow border border-outline-variant/20 flex items-center gap-3 pointer-events-auto">
             <div className="flex items-center gap-1.5 text-sm font-semibold">
               <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
@@ -103,15 +103,15 @@ export default function AdminMapPage() {
               <span className="text-secondary">On Job ({stats.onJob})</span>
             </div>
           </div>
-          <div className="bg-white/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow border border-outline-variant/20 text-sm font-semibold text-on-surface pointer-events-auto">
+          <div className="bg-white/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow border border-outline-variant/20 text-xs sm:text-sm font-semibold text-on-surface pointer-events-auto">
             {techs.length} Technicians Online
           </div>
         </div>
 
         {/* Bottom Info */}
-        <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-xl p-3 border border-outline-variant/20 shadow z-10 flex items-center justify-between pointer-events-none">
-          <span className="text-xs text-on-surface-variant">Live map — loaded from real-time coordinates</span>
-          <div className="flex items-center gap-1 text-xs text-green-600 font-bold">
+        <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-xl p-3 border border-outline-variant/20 shadow z-10 flex items-center justify-between pointer-events-none gap-2">
+          <span className="text-[10px] sm:text-xs text-on-surface-variant truncate">Live map — loaded from real-time coordinates</span>
+          <div className="flex items-center gap-1 text-xs text-green-600 font-bold flex-shrink-0">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             Live
           </div>
@@ -119,8 +119,8 @@ export default function AdminMapPage() {
       </div>
 
       {/* Sidebar Tech List */}
-      <div className="w-72 flex flex-col gap-4 overflow-y-auto">
-        <div className="bg-white rounded-2xl border border-outline-variant/20 shadow-sm p-4 flex-1 flex flex-col overflow-hidden">
+      <div className="w-full lg:w-72 flex flex-col sm:flex-row lg:flex-col gap-4 lg:overflow-y-auto flex-shrink-0 max-h-[300px] lg:max-h-none">
+        <div className="bg-white rounded-2xl border border-outline-variant/20 shadow-sm p-4 flex-1 flex flex-col overflow-hidden min-h-[180px] lg:min-h-0">
           <h3 className="font-bold text-primary mb-3 flex-shrink-0">Active Technicians ({techs.length})</h3>
           <div className="space-y-3 overflow-y-auto flex-1 pr-1">
             {loading ? (
@@ -129,7 +129,7 @@ export default function AdminMapPage() {
               ))
             ) : techs.length === 0 ? (
               <div className="text-center py-8 text-on-surface-variant text-sm font-semibold">
-                No technicians currently online.
+                No technicians online.
               </div>
             ) : (
               techs.map(t => (
@@ -149,7 +149,7 @@ export default function AdminMapPage() {
         </div>
 
         {/* Quick Stats */}
-        <div className="bg-white rounded-2xl border border-outline-variant/20 shadow-sm p-4 space-y-3 flex-shrink-0">
+        <div className="bg-white rounded-2xl border border-outline-variant/20 shadow-sm p-4 space-y-3 flex-shrink-0 w-full sm:w-64 lg:w-full">
           <h3 className="font-bold text-primary">Live Stats</h3>
           {[
             { label: 'Total Orders', value: stats.activeOrders.toString(), color: 'text-primary' },

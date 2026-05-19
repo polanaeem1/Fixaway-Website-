@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ReactNode } from 'react';
 import AuthGuard from '@/components/auth/AuthGuard';
 import { useAuthStore } from '@/store/auth.store';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useToast } from '@/components/ui/ToastProvider';
 import NotificationDropdown from '@/components/layout/NotificationDropdown';
 
@@ -23,11 +23,28 @@ function SupportChatButton() {
 export default function CustomerLayout({ children }: { children: ReactNode }) {
   const { user, clearAuth } = useAuthStore();
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = () => {
     clearAuth();
     router.replace('/login');
   };
+
+  const menuItems = [
+    { href: '/customer/dashboard', label: 'Home', icon: 'home' },
+    { href: '/customer/requests', label: 'My Requests', icon: 'history' },
+    { href: '/customer/emergency', label: 'Emergency', icon: 'emergency_home' },
+    { href: '/customer/wallet', label: 'Wallet', icon: 'account_balance_wallet' },
+    { href: '/customer/profile', label: 'Profile', icon: 'settings' },
+  ];
+
+  const mobileMenuItems = [
+    { href: '/customer/dashboard', label: 'Home', icon: 'home' },
+    { href: '/customer/requests', label: 'Requests', icon: 'assignment' },
+    { href: '/customer/emergency', label: 'SOS', icon: 'emergency_share' },
+    { href: '/customer/wallet', label: 'Wallet', icon: 'account_balance_wallet' },
+    { href: '/customer/profile', label: 'Profile', icon: 'person' },
+  ];
 
   return (
     <AuthGuard requiredRole="CUSTOMER">
@@ -72,26 +89,23 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
         <nav className="flex-1 space-y-sm">
-          <Link href="/customer/dashboard" className="flex items-center gap-md p-md bg-primary-container text-on-primary-container rounded-lg transition-all duration-300">
-            <span className="material-symbols-outlined">home</span>
-            <span className="font-body-md">Home</span>
-          </Link>
-          <Link href="/customer/requests" className="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300">
-            <span className="material-symbols-outlined">history</span>
-            <span className="font-body-md">My Requests</span>
-          </Link>
-          <Link href="/customer/emergency" className="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300">
-            <span className="material-symbols-outlined">emergency_home</span>
-            <span className="font-body-md">Emergency</span>
-          </Link>
-          <Link href="/customer/wallet" className="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300">
-            <span className="material-symbols-outlined">account_balance_wallet</span>
-            <span className="font-body-md">Wallet</span>
-          </Link>
-          <Link href="/customer/profile" className="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all duration-300">
-            <span className="material-symbols-outlined">settings</span>
-            <span className="font-body-md">Profile</span>
-          </Link>
+          {menuItems.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-md p-md rounded-lg transition-all duration-300 ${
+                  isActive
+                    ? 'bg-primary-container text-on-primary-container font-semibold'
+                    : 'text-on-surface-variant hover:bg-surface-container-high'
+                }`}
+              >
+                <span className="material-symbols-outlined">{item.icon}</span>
+                <span className="font-body-md">{item.label}</span>
+              </Link>
+            );
+          })}
         </nav>
         <div className="mt-auto p-md space-y-2">
           <button className="w-full py-md bg-secondary-container text-on-secondary-container rounded-xl font-h2 text-body-md hover:shadow-lg transition-shadow">
@@ -110,23 +124,26 @@ export default function CustomerLayout({ children }: { children: ReactNode }) {
       </div>
 
       {/* BottomNavBar (Mobile) */}
-      <nav className="lg:hidden fixed bottom-0 left-0 w-full flex justify-around items-end pb-4 px-2 bg-surface/90 backdrop-blur-lg border-t border-white/50 shadow-[0px_-4px_20px_rgba(26,54,93,0.05)] z-50 rounded-t-xl">
-        <Link href="/customer/dashboard" className="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full w-12 h-12 mb-2 active:scale-90 transition-transform">
-          <span className="material-symbols-outlined">explore</span>
-          <span className="font-label-caps text-[10px] hidden">Explore</span>
-        </Link>
-        <Link href="/customer/requests" className="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-90 transition-transform">
-          <span className="material-symbols-outlined">assignment</span>
-          <span className="text-label-caps text-[10px] mt-1">Requests</span>
-        </Link>
-        <Link href="/customer/emergency" className="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-90 transition-transform">
-          <span className="material-symbols-outlined">emergency_share</span>
-          <span className="text-label-caps text-[10px] mt-1">SOS</span>
-        </Link>
-        <Link href="/customer/profile" className="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary active:scale-90 transition-transform">
-          <span className="material-symbols-outlined">person</span>
-          <span className="text-label-caps text-[10px] mt-1">Profile</span>
-        </Link>
+      <nav className="lg:hidden fixed bottom-0 left-0 w-full flex justify-around items-center py-2 px-2 bg-surface/90 backdrop-blur-lg border-t border-white/50 shadow-[0px_-4px_20px_rgba(26,54,93,0.05)] z-50 rounded-t-xl">
+        {mobileMenuItems.map((item) => {
+          const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 ${
+                isActive
+                  ? 'text-primary font-bold'
+                  : 'text-on-surface-variant hover:text-primary/70'
+              }`}
+            >
+              <span className={`material-symbols-outlined text-2xl ${isActive ? 'scale-110' : ''}`} style={{ fontVariationSettings: isActive ? "'FILL' 1" : "" }}>
+                {item.icon}
+              </span>
+              <span className="text-[10px] tracking-wide mt-0.5">{item.label}</span>
+            </Link>
+          );
+        })}
       </nav>
 
       {/* Roadside Emergency FAB */}

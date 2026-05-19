@@ -10,7 +10,7 @@ export default function LandingPage() {
       <Navbar />
       <main className="pt-16 pb-24">
         {/* Hero Section */}
-        <section className="relative min-h-[870px] flex items-center overflow-hidden bg-surface-container-lowest">
+        <section className="relative min-h-[500px] md:min-h-[870px] flex items-center overflow-hidden bg-surface-container-lowest">
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-r from-surface-container-lowest via-surface-container-lowest/80 to-transparent z-10"></div>
             <img className="w-full h-full object-cover" alt="Hero background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfRysUbWl1U0GGz4PYDfe_oS-CbbNdzC4WYiut9410_BP3wT-dH1k-i-rzfexcH6bbWpnYkNl2YqJbe_F6pcpin_psLfxBNqoo_mUtB74hPmNMb8hijuyzLlKr-ibIfjeN-ja7HVSXA_BxWoiRDTeJbDrZOGnHKGquZD_w0xOexRXXnuEpBcgu80JSrMdqzAk9q41e-mKuALo4pL2RFAR4gktQeK7Hq72CA2OLdIoRyGvvNy66glZc0Mteafs9TPNoVqbrw9y9cDk" />
@@ -20,11 +20,11 @@ export default function LandingPage() {
               <span className="bg-primary-container text-white px-md py-xs rounded-full font-label-caps text-label-caps mb-lg inline-block">
                 Fixaway Premium Services
               </span>
-              <h1 className="font-display-lg text-display-lg text-primary mb-md leading-tight">
+              <h1 className="font-display-lg text-[2.2rem] sm:text-[3rem] md:text-display-lg text-primary mb-md leading-tight">
                 Trusted Help, <br />Right When You Need It.
-                <span className="block text-secondary-container mt-sm text-3xl">Reliable Assistance, Whenever You Need It</span>
+                <span className="block text-secondary-container mt-sm text-xl sm:text-2xl md:text-3xl">Reliable Assistance, Whenever You Need It</span>
               </h1>
-              <p className="text-body-lg text-on-surface-variant mb-xl max-w-lg font-body-lg">
+              <p className="text-body-lg text-on-surface-variant mb-xl max-w-lg font-body-lg text-sm sm:text-base">
                 Premium home maintenance and roadside assistance at your fingertips. Professional, verified technicians ready to serve you 24/7.
               </p>
               <div className="flex flex-col sm:flex-row gap-md">
@@ -55,10 +55,10 @@ export default function LandingPage() {
                   <span className="material-symbols-outlined text-primary text-h1">plumbing</span>
                 </div>
                 <h3 className="font-h2 text-h2 text-primary mb-xs">Plumbing</h3>
-                <p className="text-on-surface-variant font-body-md">Leak repairs, pipe installation, and water heater maintenance by certified experts.</p>
+                <p className="text-on-surface-variant font-body-md text-sm sm:text-base">Leak repairs, pipe installation, and water heater maintenance by certified experts.</p>
               </div>
               <div className="mt-xl flex justify-between items-center">
-                <span className="text-secondary font-bold font-body-md">Starting from 150 EGP</span>
+                <span className="text-secondary font-bold font-body-md text-sm">Starting from 150 EGP</span>
                 <span className="material-symbols-outlined text-primary group-hover:-translate-x-2 transition-transform rtl:rotate-180">arrow_back</span>
               </div>
             </div>
@@ -68,7 +68,7 @@ export default function LandingPage() {
                 <span className="material-symbols-outlined text-primary text-h1">bolt</span>
               </div>
               <h3 className="font-h2 text-h2 text-primary mb-xs">Electrical</h3>
-              <p className="text-on-surface-variant font-body-md">Wiring, lighting, and outlet repairs.</p>
+              <p className="text-on-surface-variant font-body-md text-sm">Wiring, lighting, and outlet repairs.</p>
             </div>
             {/* Small Service: AC */}
             <div className="md:col-span-4 bg-white rounded-xl p-lg shadow-sm border border-outline-variant/30 flex flex-col group hover:shadow-xl transition-all">
@@ -76,27 +76,27 @@ export default function LandingPage() {
                 <span className="material-symbols-outlined text-primary text-h1">ac_unit</span>
               </div>
               <h3 className="font-h2 text-h2 text-primary mb-xs">Air Conditioning</h3>
-              <p className="text-on-surface-variant font-body-md">Cooling maintenance and installation.</p>
+              <p className="text-on-surface-variant font-body-md text-sm">Cooling maintenance and installation.</p>
             </div>
             {/* Roadside Feature Card */}
-            <div className="md:col-span-8 bg-primary text-white rounded-xl p-lg shadow-xl relative overflow-hidden flex flex-col justify-center">
+            <div className="md:col-span-8 bg-primary text-white rounded-xl p-lg shadow-xl relative overflow-hidden flex flex-col justify-center min-h-[200px]">
               <div className="absolute left-0 top-0 w-1/2 h-full opacity-10 flex items-center">
                 <span className="material-symbols-outlined text-[200px] absolute -left-10">minor_crash</span>
               </div>
-              <div className="relative z-10 text-right">
-                <h3 className="font-h1 text-h1 mb-md">Urgent Roadside Items</h3>
-                <div className="flex flex-wrap gap-md justify-end">
+              <div className="relative z-10 text-left md:text-right">
+                <h3 className="font-h1 text-h2 sm:text-h1 mb-md">Urgent Roadside Items</h3>
+                <div className="flex flex-wrap gap-md justify-start md:justify-end">
                   <div className="flex items-center gap-xs bg-white/10 px-md py-sm rounded-full backdrop-blur-md">
                     <span className="material-symbols-outlined text-secondary-container">battery_charging_full</span>
-                    <span className="font-label-caps">Battery Jumpstart</span>
+                    <span className="font-label-caps text-xs">Battery Jumpstart</span>
                   </div>
                   <div className="flex items-center gap-xs bg-white/10 px-md py-sm rounded-full backdrop-blur-md">
                     <span className="material-symbols-outlined text-secondary-container">local_gas_station</span>
-                    <span className="font-label-caps">Fuel Delivery</span>
+                    <span className="font-label-caps text-xs">Fuel Delivery</span>
                   </div>
                   <div className="flex items-center gap-xs bg-white/10 px-md py-sm rounded-full backdrop-blur-md">
                     <span className="material-symbols-outlined text-secondary-container">auto_towing</span>
-                    <span className="font-label-caps">Towing Support</span>
+                    <span className="font-label-caps text-xs">Towing Support</span>
                   </div>
                 </div>
               </div>
@@ -119,7 +119,7 @@ export default function LandingPage() {
                   <span className="absolute -top-2 -right-2 w-8 h-8 bg-secondary-container text-primary font-bold rounded-full flex items-center justify-center">1</span>
                 </div>
                 <h4 className="font-h2 text-h2 text-primary mb-sm">Request</h4>
-                <p className="text-on-surface-variant font-body-md">Choose your service and tell us what you need fixed.</p>
+                <p className="text-on-surface-variant font-body-md text-sm">Choose your service and tell us what you need fixed.</p>
               </div>
               {/* Step 2 */}
               <div className="text-center group">
@@ -128,7 +128,7 @@ export default function LandingPage() {
                   <span className="absolute -top-2 -right-2 w-8 h-8 bg-secondary-container text-primary font-bold rounded-full flex items-center justify-center">2</span>
                 </div>
                 <h4 className="font-h2 text-h2 text-primary mb-sm">Quote</h4>
-                <p className="text-on-surface-variant font-body-md">Receive a transparent, fair pricing quote instantly.</p>
+                <p className="text-on-surface-variant font-body-md text-sm">Receive a transparent, fair pricing quote instantly.</p>
               </div>
               {/* Step 3 */}
               <div className="text-center group">
@@ -137,7 +137,7 @@ export default function LandingPage() {
                   <span className="absolute -top-2 -right-2 w-8 h-8 bg-secondary-container text-primary font-bold rounded-full flex items-center justify-center">3</span>
                 </div>
                 <h4 className="font-h2 text-h2 text-primary mb-sm">Solve</h4>
-                <p className="text-on-surface-variant font-body-md">Your technician arrives and completes the job perfectly.</p>
+                <p className="text-on-surface-variant font-body-md text-sm">Your technician arrives and completes the job perfectly.</p>
               </div>
             </div>
           </div>
@@ -146,32 +146,32 @@ export default function LandingPage() {
         {/* Trust Signals */}
         <section className="py-xl">
           <div className="container mx-auto px-gutter max-w-container-max">
-            <div className="flex flex-wrap justify-around items-center gap-xl bg-white p-xl rounded-2xl shadow-sm border border-outline-variant/30">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-xl bg-white p-xl rounded-2xl shadow-sm border border-outline-variant/30">
               <div className="flex items-center gap-md">
-                <div className="w-16 h-16 rounded-full bg-primary/5 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-primary/5 flex items-center justify-center flex-shrink-0">
                   <span className="material-symbols-outlined text-primary text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                 </div>
                 <div>
-                  <p className="font-h2 text-h2 text-primary">Verified Technicians</p>
-                  <p className="text-on-surface-variant font-body-md">Background checked professionals</p>
+                  <p className="font-h2 text-lg font-bold text-primary">Verified Technicians</p>
+                  <p className="text-on-surface-variant text-sm">Background checked professionals</p>
                 </div>
               </div>
               <div className="flex items-center gap-md">
-                <div className="w-16 h-16 rounded-full bg-primary/5 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-primary/5 flex items-center justify-center flex-shrink-0">
                   <span className="material-symbols-outlined text-primary text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>payments</span>
                 </div>
                 <div>
-                  <p className="font-h2 text-h2 text-primary">Fair Pricing</p>
-                  <p className="text-on-surface-variant font-body-md">No hidden fees, upfront quotes</p>
+                  <p className="font-h2 text-lg font-bold text-primary">Fair Pricing</p>
+                  <p className="text-on-surface-variant text-sm">No hidden fees, upfront quotes</p>
                 </div>
               </div>
               <div className="flex items-center gap-md">
-                <div className="w-16 h-16 rounded-full bg-primary/5 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-primary/5 flex items-center justify-center flex-shrink-0">
                   <span className="material-symbols-outlined text-primary text-[32px]" style={{ fontVariationSettings: "'FILL' 1" }}>location_searching</span>
                 </div>
                 <div>
-                  <p className="font-h2 text-h2 text-primary">Real-time Tracking</p>
-                  <p className="text-on-surface-variant font-body-md">Track your help live on map</p>
+                  <p className="font-h2 text-lg font-bold text-primary">Real-time Tracking</p>
+                  <p className="text-on-surface-variant text-sm">Track your help live on map</p>
                 </div>
               </div>
             </div>
@@ -184,27 +184,27 @@ export default function LandingPage() {
             <div className="bg-primary-container rounded-[2rem] p-xl flex flex-col md:flex-row items-center justify-between gap-xl relative overflow-hidden">
               <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-secondary-container/20 rounded-full blur-[100px]"></div>
               <div className="text-left md:w-1/2 z-10">
-                <h2 className="font-display-lg text-display-lg text-white mb-md">Control everything from your phone.</h2>
-                <p className="text-on-primary-container text-body-lg mb-xl font-body-lg">Download the Fixaway app for a faster experience, exclusive discounts, and prioritized service scheduling.</p>
-                <div className="flex flex-wrap gap-md justify-end">
+                <h2 className="font-display-lg text-[2rem] sm:text-display-lg text-white mb-md leading-tight">Control everything from your phone.</h2>
+                <p className="text-on-primary-container text-body-lg mb-xl font-body-lg text-sm sm:text-base">Download the Fixaway app for a faster experience, exclusive discounts, and prioritized service scheduling.</p>
+                <div className="flex flex-wrap gap-md justify-start">
                   <button onClick={() => showToast('App coming soon!', 'info')} className="bg-black text-white px-lg py-sm rounded-lg flex items-center gap-md border border-white/20 hover:bg-white/10 transition-colors">
-                    <span className="material-symbols-outlined text-h1">phone_iphone</span>
-                    <div className="text-right">
+                    <span className="material-symbols-outlined text-[32px]">phone_iphone</span>
+                    <div className="text-left">
                       <p className="text-[10px] font-label-caps uppercase">Download on</p>
-                      <p className="font-bold text-body-md">App Store</p>
+                      <p className="font-bold text-xs">App Store</p>
                     </div>
                   </button>
                   <button onClick={() => showToast('App coming soon!', 'info')} className="bg-black text-white px-lg py-sm rounded-lg flex items-center gap-md border border-white/20 hover:bg-white/10 transition-colors">
-                    <span className="material-symbols-outlined text-h1">play_arrow</span>
-                    <div className="text-right">
+                    <span className="material-symbols-outlined text-[32px]">play_arrow</span>
+                    <div className="text-left">
                       <p className="text-[10px] font-label-caps uppercase">Get it on</p>
-                      <p className="font-bold text-body-md">Google Play</p>
+                      <p className="font-bold text-xs">Google Play</p>
                     </div>
                   </button>
                 </div>
               </div>
               <div className="md:w-1/2 flex justify-center items-center z-10">
-                <img className="w-full max-w-[400px] h-auto rounded-[3rem] shadow-2xl border-8 border-primary rotate-3" alt="App preview" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAx_mjSkuYfW3NkEjCJoP0B6ZCvC_kjY-_P-Kv0-p3cSMhOZ7ayaS3CBsv2RJ31Ic3-DgBlr5RLdcgrpHqEbQR4p1mhVO-cHViXoMtfylIfkn6f2EwnNNGEiLeO4In-L-9COVVqGOnZsxujOU90BiLwoNV_AjIjiJ-LhgOglrtf0hzWQrEdoKnKY4KPzTy6-aKLVVFyrEyr7pMiT5C8YGXpjLPnRttBWw1YHp3RRX_d80dUbbyp9S6ylz25pm9agkFnzCDHNF83BuU" />
+                <img className="w-full max-w-[320px] sm:max-w-[400px] h-auto rounded-[3rem] shadow-2xl border-8 border-primary rotate-3" alt="App preview" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAx_mjSkuYfW3NkEjCJoP0B6ZCvC_kjY-_P-Kv0-p3cSMhOZ7ayaS3CBsv2RJ31Ic3-DgBlr5RLdcgrpHqEbQR4p1mhVO-cHViXoMtfylIfkn6f2EwnNNGEiLeO4In-L-9COVVqGOnZsxujOU90BiLwoNV_AjIjiJ-LhgOglrtf0hzWQrEdoKnKY4KPzTy6-aKLVVFyrEyr7pMiT5C8YGXpjLPnRttBWw1YHp3RRX_d80dUbbyp9S6ylz25pm9agkFnzCDHNF83BuU" />
               </div>
             </div>
           </div>

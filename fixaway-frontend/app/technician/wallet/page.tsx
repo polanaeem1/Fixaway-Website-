@@ -56,7 +56,7 @@ export default function TechnicianWalletPage() {
             <p className="text-white text-5xl font-bold mb-1">EGP {(balance ?? 0).toLocaleString()}</p>
           )}
           <p className="text-white/50 text-sm">.00 available to withdraw</p>
-          <div className="flex gap-3 mt-8">
+          <div className="flex flex-col sm:flex-row gap-3 mt-8">
             <button
               onClick={handleWithdraw}
               disabled={isWithdrawing}
@@ -79,13 +79,13 @@ export default function TechnicianWalletPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         {[
           { label: 'Total Earned', value: loading ? '...' : `EGP ${((balance ?? 0) + 38800).toLocaleString()}`, icon: 'trending_up', color: 'text-green-600' },
           { label: 'Withdrawn', value: 'EGP 38.8K', icon: 'arrow_outward', color: 'text-primary' },
           { label: 'Pending Payout', value: 'EGP 0', icon: 'schedule', color: 'text-on-surface-variant' },
         ].map(s => (
-          <div key={s.label} className="bg-white rounded-2xl p-5 border border-outline-variant/20 shadow-sm text-center">
+          <div key={s.label} className="bg-white rounded-2xl p-5 border border-outline-variant/20 shadow-sm text-center flex flex-col items-center justify-center">
             <span className={`material-symbols-outlined ${s.color} block mb-2 text-3xl`} style={{ fontVariationSettings: "'FILL' 1" }}>{s.icon}</span>
             <p className="font-bold text-primary text-lg">{s.value}</p>
             <p className="text-xs text-on-surface-variant mt-1">{s.label}</p>

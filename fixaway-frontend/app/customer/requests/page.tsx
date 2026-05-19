@@ -73,31 +73,33 @@ export default function CustomerRequestsPage() {
 
   return (
     <div className="max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-primary">My Requests</h1>
           <p className="text-on-surface-variant mt-1">Track your service history and active jobs</p>
         </div>
-        <a href="/customer/requests/new" className="flex items-center gap-2 bg-primary text-white px-5 py-3 rounded-xl font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-95">
+        <a href="/customer/requests/new" className="flex items-center justify-center gap-2 bg-primary text-white px-5 py-3 rounded-xl font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-95 self-start sm:self-auto">
           <span className="material-symbols-outlined text-[20px]">add</span>
           New Request
         </a>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
           { label: 'Total Requests', value: loading ? '—' : total.toString(), icon: 'receipt_long', color: 'text-primary bg-primary-container/30' },
           { label: 'Completed', value: loading ? '—' : completed.toString(), icon: 'check_circle', color: 'text-green-700 bg-green-50' },
           { label: 'Active', value: loading ? '—' : active.toString(), icon: 'pending_actions', color: 'text-blue-700 bg-blue-50' },
           { label: 'Total Spent', value: loading ? '—' : `EGP ${spent.toLocaleString()}`, icon: 'payments', color: 'text-secondary bg-secondary-container/30' },
         ].map(c => (
-          <div key={c.label} className="bg-white rounded-2xl p-5 border border-outline-variant/20 shadow-sm">
-            <div className={`w-10 h-10 rounded-xl ${c.color} flex items-center justify-center mb-3`}>
+          <div key={c.label} className="bg-white rounded-2xl p-5 border border-outline-variant/20 shadow-sm flex flex-col justify-between">
+            <div className={`w-10 h-10 rounded-xl ${c.color} flex items-center justify-center mb-3 flex-shrink-0`}>
               <span className="material-symbols-outlined text-[20px]">{c.icon}</span>
             </div>
-            <p className="text-2xl font-bold text-primary">{c.value}</p>
-            <p className="text-sm text-on-surface-variant mt-1">{c.label}</p>
+            <div>
+              <p className="text-2xl font-bold text-primary">{c.value}</p>
+              <p className="text-sm text-on-surface-variant mt-1">{c.label}</p>
+            </div>
           </div>
         ))}
       </div>

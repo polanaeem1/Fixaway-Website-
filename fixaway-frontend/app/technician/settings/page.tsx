@@ -57,11 +57,11 @@ export default function TechnicianSettingsPage() {
           </div>
         </div>
         <div className="pt-14 pb-6 px-6">
-          <div className="flex items-end justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
             <div>
               <h2 className="text-xl font-bold text-primary">{user?.name || 'Technician'}</h2>
               <p className="text-on-surface-variant text-sm">{user?.email || '—'}</p>
-              <div className="flex items-center gap-2 mt-2">
+              <div className="flex flex-wrap items-center gap-2 mt-2">
                 <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
                   <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                   Verified Technician
@@ -70,11 +70,11 @@ export default function TechnicianSettingsPage() {
               </div>
             </div>
             {!isEditing ? (
-              <button onClick={() => setIsEditing(true)} className="border border-outline-variant px-4 py-2 rounded-xl text-sm font-semibold text-on-surface hover:bg-surface-container-low transition-colors flex items-center gap-2">
+              <button onClick={() => setIsEditing(true)} className="border border-outline-variant px-4 py-2 rounded-xl text-sm font-semibold text-on-surface hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2 self-start sm:self-auto">
                 <span className="material-symbols-outlined text-[16px]">edit</span> Edit Profile
               </button>
             ) : (
-              <div className="flex gap-2">
+              <div className="flex gap-2 self-start sm:self-auto">
                 <button onClick={() => setIsEditing(false)} className="border border-outline-variant px-4 py-2 rounded-xl text-sm font-semibold text-on-surface hover:bg-surface-container-low transition-colors">
                   Cancel
                 </button>
@@ -150,22 +150,22 @@ export default function TechnicianSettingsPage() {
           <span className="material-symbols-outlined text-[20px]">schedule</span>
           Working Hours
         </h3>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day, i) => (
-            <div key={day} className="flex items-center justify-between">
+            <div key={day} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-2 border-b border-outline-variant/10 last:border-0 pb-3 sm:pb-2">
               <div className="flex items-center gap-3 w-32">
                 <div className={`w-3 h-3 rounded-full ${i < 5 ? 'bg-green-500' : 'bg-outline-variant'}`} />
                 <span className="text-sm font-medium text-on-surface">{day}</span>
               </div>
               {i < 5 ? (
-                <div className="flex items-center gap-2 text-sm text-on-surface-variant">
+                <div className="flex flex-wrap items-center gap-2 text-sm text-on-surface-variant">
                   <span className="bg-surface-container-low px-3 py-1 rounded-lg font-mono">09:00 AM</span>
                   <span>—</span>
                   <span className="bg-surface-container-low px-3 py-1 rounded-lg font-mono">06:00 PM</span>
                   <button className="text-primary ml-2 hover:underline text-xs">Edit</button>
                 </div>
               ) : (
-                <span className="text-sm text-on-surface-variant">Day Off</span>
+                <span className="text-sm text-on-surface-variant pl-6 sm:pl-0">Day Off</span>
               )}
             </div>
           ))}

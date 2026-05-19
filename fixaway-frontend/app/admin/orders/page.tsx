@@ -43,36 +43,38 @@ export default function AdminOrdersPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-primary">Orders</h1>
           <p className="text-on-surface-variant mt-1">Monitor all platform service orders in real-time</p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="relative">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+          <div className="relative flex-1 sm:flex-initial">
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
             <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-              placeholder="Search orders..." className="pl-9 pr-4 py-2.5 bg-white border border-outline-variant/40 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary w-64" />
+              placeholder="Search orders..." className="pl-9 pr-4 py-2.5 bg-white border border-outline-variant/40 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary w-full sm:w-64" />
           </div>
-          <button className="flex items-center gap-2 bg-surface-container-low border border-outline-variant/40 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-surface-container-high transition-colors">
+          <button className="flex items-center justify-center gap-2 bg-surface-container-low border border-outline-variant/40 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-surface-container-high transition-colors">
             <span className="material-symbols-outlined text-[18px]">download</span> Export
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
           { label: 'Total Orders', value: loading ? '—' : orders.length.toLocaleString(), icon: 'receipt_long', color: 'bg-primary-container/30 text-primary' },
           { label: 'Active Now', value: loading ? '—' : active.toString(), icon: 'pending_actions', color: 'bg-blue-50 text-blue-700' },
           { label: 'Completed', value: loading ? '—' : completed.toString(), icon: 'check_circle', color: 'bg-green-50 text-green-700' },
           { label: 'Cancelled', value: loading ? '—' : cancelled.toString(), icon: 'cancel', color: 'bg-red-50 text-red-700' },
         ].map(c => (
-          <div key={c.label} className="bg-white rounded-2xl p-5 border border-outline-variant/20 shadow-sm">
-            <div className={`w-10 h-10 rounded-xl ${c.color} flex items-center justify-center mb-3`}>
+          <div key={c.label} className="bg-white rounded-2xl p-5 border border-outline-variant/20 shadow-sm flex flex-col justify-between">
+            <div className={`w-10 h-10 rounded-xl ${c.color} flex items-center justify-center mb-3 flex-shrink-0`}>
               <span className="material-symbols-outlined text-[20px]">{c.icon}</span>
             </div>
-            <p className="text-2xl font-bold text-primary">{c.value}</p>
-            <p className="text-sm text-on-surface-variant mt-1">{c.label}</p>
+            <div>
+              <p className="text-2xl font-bold text-primary">{c.value}</p>
+              <p className="text-sm text-on-surface-variant mt-1">{c.label}</p>
+            </div>
           </div>
         ))}
       </div>

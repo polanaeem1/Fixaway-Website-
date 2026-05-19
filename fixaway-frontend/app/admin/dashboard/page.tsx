@@ -61,7 +61,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto">
       {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {kpis.map((k) => (
           <div key={k.label} className={`bg-white rounded-2xl p-5 border shadow-sm relative overflow-hidden group ${k.urgent ? 'border-error/30 bg-error/5' : 'border-outline-variant/20'}`}>
             <div className="flex justify-between items-start mb-3">
@@ -150,7 +150,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Quick Nav Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { href: '/admin/users', icon: 'group', label: 'Manage Users', count: '14.8K', color: 'bg-primary-container text-on-primary-container' },
           { href: '/admin/technicians', icon: 'engineering', label: 'Technicians', count: '527', color: 'bg-secondary-container text-on-secondary-container' },

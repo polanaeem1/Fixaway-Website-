@@ -45,19 +45,21 @@ export default function TechnicianRequestsPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
           { label: 'Total Jobs', value: loading ? '—' : total.toString(), icon: 'work_history', color: 'bg-primary-container/30 text-primary' },
           { label: 'This Month', value: loading ? '—' : thisMonthOrders.length.toString(), icon: 'calendar_today', color: 'bg-blue-50 text-blue-700' },
           { label: 'Avg Rating', value: '4.9 ★', icon: 'star', color: 'bg-yellow-50 text-yellow-600' },
           { label: 'Monthly Earned', value: loading ? '—' : `EGP ${thisMonthEarned.toLocaleString()}`, icon: 'payments', color: 'bg-secondary-container/30 text-secondary' },
         ].map(c => (
-          <div key={c.label} className="bg-white rounded-2xl p-5 border border-outline-variant/20 shadow-sm">
-            <div className={`w-10 h-10 rounded-xl ${c.color} flex items-center justify-center mb-3`}>
+          <div key={c.label} className="bg-white rounded-2xl p-5 border border-outline-variant/20 shadow-sm flex flex-col justify-between">
+            <div className={`w-10 h-10 rounded-xl ${c.color} flex items-center justify-center mb-3 flex-shrink-0`}>
               <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>{c.icon}</span>
             </div>
-            <p className="text-2xl font-bold text-primary">{c.value}</p>
-            <p className="text-sm text-on-surface-variant mt-1">{c.label}</p>
+            <div>
+              <p className="text-2xl font-bold text-primary">{c.value}</p>
+              <p className="text-sm text-on-surface-variant mt-1">{c.label}</p>
+            </div>
           </div>
         ))}
       </div>

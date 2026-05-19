@@ -114,10 +114,10 @@ export default function CustomerDashboardPage() {
       </div>
 
       {/* Top Bento Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-5 mb-6">
 
         {/* Wallet Card */}
-        <div className="md:col-span-4 bg-primary rounded-3xl p-7 relative overflow-hidden shadow-xl shadow-primary/20">
+        <div className="col-span-1 lg:col-span-4 bg-primary rounded-3xl p-7 relative overflow-hidden shadow-xl shadow-primary/20">
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full" />
           <div className="relative z-10">
             <div className="flex items-center gap-2 text-white/70 mb-2 text-sm">
@@ -140,7 +140,7 @@ export default function CustomerDashboardPage() {
         </div>
 
         {/* Active Order Status */}
-        <div className="md:col-span-5 bg-white rounded-3xl border border-outline-variant/20 shadow-sm p-7">
+        <div className="col-span-1 lg:col-span-5 bg-white rounded-3xl border border-outline-variant/20 shadow-sm p-7">
           {activeOrder ? (
             <div>
               <div className="flex items-center justify-between mb-4">
@@ -157,8 +157,8 @@ export default function CustomerDashboardPage() {
               <div className="flex justify-between mt-1.5 text-xs text-on-surface-variant">
                 <span>Technician en route</span><span>~12 min away</span>
               </div>
-              <div className="flex items-center gap-4 mt-4">
-                <Link href={`/chat/${activeOrder.id}`} className="flex-1 flex items-center justify-center gap-1.5 bg-primary text-white py-2 rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all active:scale-95 shadow-sm shadow-primary/20">
+              <div className="flex flex-col sm:flex-row items-center gap-4 mt-4">
+                <Link href={`/chat/${activeOrder.id}`} className="w-full sm:flex-1 flex items-center justify-center gap-1.5 bg-primary text-white py-2 rounded-xl text-sm font-semibold hover:bg-primary/90 transition-all active:scale-95 shadow-sm shadow-primary/20">
                   <span className="material-symbols-outlined text-[18px]">forum</span> Chat
                 </Link>
                 <Link href="/customer/requests" className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
@@ -175,7 +175,7 @@ export default function CustomerDashboardPage() {
                 <p className="font-bold text-primary text-lg">No active service</p>
                 <p className="text-sm text-on-surface-variant mt-1">Book a technician to get started</p>
               </div>
-              <Link href="/customer/requests/new" className="bg-primary text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all active:scale-95 flex items-center gap-2">
+              <Link href="/customer/requests/new" className="bg-primary text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-primary/90 transition-all active:scale-95 flex items-center justify-center gap-2">
                 <span className="material-symbols-outlined text-[18px]">add</span> Book Now
               </Link>
             </div>
@@ -183,7 +183,7 @@ export default function CustomerDashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="md:col-span-3 grid grid-cols-2 gap-3">
+        <div className="col-span-1 md:col-span-2 lg:col-span-3 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-3">
           {[
             { href: '/customer/requests/new', icon: 'home_repair_service', label: 'Home Service', color: 'bg-primary-container text-on-primary-container' },
             { href: '/customer/emergency', icon: 'emergency_share', label: 'SOS Roadside', color: 'bg-error text-white' },
@@ -200,7 +200,7 @@ export default function CustomerDashboardPage() {
       </div>
 
       {/* Services Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-6">
         {[
           { label: 'Plumbing', icon: 'plumbing', href: '/customer/requests/new?type=plumbing' },
           { label: 'Electrical', icon: 'bolt', href: '/customer/requests/new?type=electrical' },
@@ -237,9 +237,9 @@ export default function CustomerDashboardPage() {
         ) : (
           <div className="divide-y divide-outline-variant/10">
             {requests.slice(0, 4).map((r: any) => (
-              <div key={r.id} className="px-5 py-4 flex items-center justify-between hover:bg-surface-container-lowest transition-colors">
+              <div key={r.id} className="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-surface-container-lowest transition-colors">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-primary">
+                  <div className="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-primary flex-shrink-0">
                     <span className="material-symbols-outlined text-[20px]">{serviceIcons[r.category?.name || r.serviceType] ?? 'handyman'}</span>
                   </div>
                   <div>
@@ -247,12 +247,12 @@ export default function CustomerDashboardPage() {
                     <p className="text-xs text-on-surface-variant">{new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto border-t border-outline-variant/10 sm:border-t-0 pt-3 sm:pt-0">
                   {r.status === 'QUOTED' && r.quotations && r.quotations.length > 0 ? (
                     <button 
                       onClick={() => handleAcceptQuote(r.quotations[0].id)}
                       disabled={isAcceptingQuote[r.quotations[0].id]}
-                      className="bg-primary text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-50"
+                      className="bg-primary text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-50 w-full sm:w-auto"
                     >
                       {isAcceptingQuote[r.quotations[0].id] ? '...' : `Accept Quote (EGP ${r.quotations[0].price})`}
                     </button>

@@ -87,7 +87,7 @@ export default function CustomerWalletPage() {
             ? <div className="h-12 w-48 bg-white/20 rounded-xl animate-pulse mb-1" />
             : <p className="text-white text-5xl font-bold mb-1">EGP {balance?.toLocaleString('en-US', { minimumFractionDigits: 2 }) ?? '—'}</p>
           }
-          <div className="flex gap-3 mt-8">
+          <div className="flex flex-col sm:flex-row gap-3 mt-8">
             <button 
               onClick={() => setIsTopUpOpen(true)}
               className="flex-1 bg-white/15 hover:bg-white/25 text-white rounded-xl py-3 px-4 font-semibold flex items-center justify-center gap-2 transition-all border border-white/20 active:scale-95"
@@ -102,13 +102,13 @@ export default function CustomerWalletPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         {[
           { label: 'Total Spent', value: `EGP ${totalSpent.toLocaleString()}`, icon: 'trending_down', color: 'text-red-600' },
           { label: 'Total Loaded', value: `EGP ${totalLoaded.toLocaleString()}`, icon: 'trending_up', color: 'text-green-600' },
           { label: 'Saved on Deals', value: 'EGP 350', icon: 'local_offer', color: 'text-secondary' },
         ].map(s => (
-          <div key={s.label} className="bg-white rounded-2xl p-5 border border-outline-variant/20 shadow-sm text-center hover:shadow-md transition-shadow cursor-default">
+          <div key={s.label} className="bg-white rounded-2xl p-5 border border-outline-variant/20 shadow-sm text-center hover:shadow-md transition-shadow cursor-default flex flex-col items-center justify-center">
             <span className={`material-symbols-outlined ${s.color} block mb-2 text-3xl`} style={{ fontVariationSettings: "'FILL' 1" }}>{s.icon}</span>
             <p className="font-bold text-primary text-lg">{loading ? '—' : s.value}</p>
             <p className="text-xs text-on-surface-variant mt-1">{s.label}</p>

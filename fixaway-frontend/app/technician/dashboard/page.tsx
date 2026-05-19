@@ -154,21 +154,21 @@ export default function TechnicianDashboardPage() {
   return (
     <div className="px-md md:px-lg max-w-container-max mx-auto min-h-screen pb-8">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
         <h1 className="text-2xl font-bold text-primary">Welcome, {user?.name?.split(' ')[0] || 'Technician'}</h1>
           <p className="text-on-surface-variant mt-1">Here is your performance overview for today.</p>
         </div>
         {/* Availability Toggle */}
         <button onClick={toggleOnline}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full border font-semibold text-sm transition-all ${isOnline ? 'bg-green-50 border-green-200 text-green-700' : 'bg-surface-container border-outline-variant text-on-surface-variant'}`}>
+          className={`flex items-center justify-center gap-2 px-4 py-2 rounded-full border font-semibold text-sm transition-all self-start sm:self-auto ${isOnline ? 'bg-green-50 border-green-200 text-green-700' : 'bg-surface-container border-outline-variant text-on-surface-variant'}`}>
           <div className={`w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-outline-variant'}`} />
           {isOnline ? 'Online' : 'Offline'}
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
-        <div className="md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div className="col-span-1 lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-5">
 
           {/* Daily Earnings Chart */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-outline-variant/10">
@@ -212,30 +212,30 @@ export default function TechnicianDashboardPage() {
           </div>
 
           {/* Active Job Map */}
-          <div className="md:col-span-2 bg-white rounded-2xl overflow-hidden min-h-[260px] flex flex-col border border-outline-variant/10 shadow-sm">
-            <div className="p-4 flex flex-row justify-between items-center bg-surface-container-lowest border-b border-outline-variant/10">
+          <div className="col-span-1 sm:col-span-2 bg-white rounded-2xl overflow-hidden min-h-[260px] flex flex-col border border-outline-variant/10 shadow-sm">
+            <div className="p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-surface-container-lowest border-b border-outline-variant/10">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-secondary">distance</span>
                 <div>
-                  <p className="font-bold text-primary">
+                  <p className="font-bold text-primary text-sm sm:text-base">
                     {activeOrders.length > 0 ? `Current Job: ${activeOrders[0].request?.category?.name || 'Active Service'}` : 'No active jobs'}
                   </p>
-                  <p className="text-sm text-on-surface-variant">
+                  <p className="text-xs sm:text-sm text-on-surface-variant">
                     {activeOrders.length > 0 ? (activeOrders[0].request?.address || 'Nearby location') : 'Standby for new jobs'}
                   </p>
                 </div>
               </div>
               {activeOrders.length > 0 ? (
-                <div className="flex gap-2">
-                  <Link href={`/chat/${activeOrders[0].id}`} className="bg-primary-container text-primary px-4 py-2 rounded-xl flex items-center gap-1.5 text-sm font-semibold hover:bg-primary-container/80 transition-all active:scale-95 border border-primary/20">
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  <Link href={`/chat/${activeOrders[0].id}`} className="bg-primary-container text-primary px-4 py-2 rounded-xl flex items-center justify-center gap-1.5 text-sm font-semibold hover:bg-primary-container/80 transition-all active:scale-95 border border-primary/20">
                     <span className="material-symbols-outlined text-[18px]">forum</span> Chat
                   </Link>
-                  <button onClick={() => handleCompleteJob(activeOrders[0].id)} disabled={isCompleting} className="bg-primary text-white px-4 py-2 rounded-xl flex items-center gap-1.5 text-sm font-semibold hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-50">
+                  <button onClick={() => handleCompleteJob(activeOrders[0].id)} disabled={isCompleting} className="bg-primary text-white px-4 py-2 rounded-xl flex items-center justify-center gap-1.5 text-sm font-semibold hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-50">
                     <span className="material-symbols-outlined text-[18px]">check_circle</span> {isCompleting ? '...' : 'Complete Job'}
                   </button>
                 </div>
               ) : (
-                <button disabled className="bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-xl flex items-center gap-1.5 text-sm font-semibold opacity-50">
+                <button disabled className="bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-xl flex items-center justify-center gap-1.5 text-sm font-semibold opacity-50 self-start sm:self-auto">
                   <span className="material-symbols-outlined text-[18px]">navigation</span> Navigate
                 </button>
               )}
@@ -251,7 +251,7 @@ export default function TechnicianDashboardPage() {
         </div>
 
         {/* Right Column */}
-        <div className="md:col-span-4 space-y-5">
+        <div className="col-span-1 lg:col-span-4 space-y-5">
 
           {/* Incoming Requests */}
           <div className="bg-white rounded-2xl shadow-sm border border-outline-variant/10 overflow-hidden">

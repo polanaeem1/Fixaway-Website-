@@ -47,13 +47,13 @@ export default function AdminTechniciansPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-primary">Technicians</h1>
           <p className="text-on-surface-variant mt-1">Review, verify, and manage service providers</p>
         </div>
         {pending > 0 && (
-          <span className="bg-yellow-100 text-yellow-700 font-bold text-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+          <span className="bg-yellow-100 text-yellow-700 font-bold text-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5 self-start sm:self-auto">
             <span className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
             {pending} Awaiting Verification
           </span>
@@ -61,7 +61,7 @@ export default function AdminTechniciansPage() {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-6">
         {[
           { key: 'ALL', label: `All (${techs.length})` },
           { key: 'VERIFIED', label: `Verified (${techs.filter(t => t.verificationStatus === 'VERIFIED').length})` },

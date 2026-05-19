@@ -84,7 +84,7 @@ function VoiceMessage({ src, isMe, sender, createdAt }: { src: string; isMe: boo
   const inactiveColor = isMe ? 'rgba(255, 255, 255, 0.35)' : 'rgba(0, 32, 69, 0.15)';
 
   return (
-    <div className={`flex items-end gap-3 p-3.5 rounded-2xl min-w-[290px] max-w-sm shadow-sm transition-all duration-300 relative border ${
+    <div className={`flex items-end gap-3 p-3.5 rounded-2xl min-w-[240px] w-full max-w-[320px] xs:max-w-sm shadow-sm transition-all duration-300 relative border ${
       isMe 
         ? 'bg-primary border-primary/20 text-on-primary rounded-tr-none' 
         : 'bg-surface-container border-outline-variant/10 text-on-surface rounded-tl-none'
@@ -306,7 +306,7 @@ export default function ChatPage({ params }: { params: { orderId: string } }) {
         setRecordingSeconds((prev) => prev + 1);
       }, 1000);
 
-    } catch (err: any) {
+    } catch {
       showToast('Could not access microphone. Please grant permission.', 'error');
     }
   };
@@ -456,7 +456,7 @@ export default function ChatPage({ params }: { params: { orderId: string } }) {
 
                     {/* Photo Media */}
                     {hasMedia && (
-                      <div className="mt-1 max-w-xs overflow-hidden rounded-xl border border-white/10 shadow">
+                      <div className="mt-1 max-w-full overflow-hidden rounded-xl border border-white/10 shadow">
                         <img 
                           src={msg.mediaUrl} 
                           alt="Photo Attachment"
@@ -583,7 +583,7 @@ export default function ChatPage({ params }: { params: { orderId: string } }) {
             {reportingMessage?.content && (
               <div className="bg-surface-container-low p-3.5 rounded-xl border border-outline-variant/20 max-h-24 overflow-y-auto">
                 <p className="text-xs text-on-surface-variant font-semibold mb-1">Flagged Message Content:</p>
-                <p className="text-sm italic text-on-surface">"{reportingMessage.content}"</p>
+                <p className="text-sm italic text-on-surface">&ldquo;{reportingMessage.content}&rdquo;</p>
               </div>
             )}
 
