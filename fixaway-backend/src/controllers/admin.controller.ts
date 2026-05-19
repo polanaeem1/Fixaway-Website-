@@ -68,11 +68,11 @@ export const getFraudAlerts = async (req: Request, res: Response) => {
 };
 
 export const resolveFraudAlert = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
   const { action, reportedUserId, fineAmount } = req.body;
 
   const alert = await prisma.fraudAlert.update({
-    where: { id: id as string },
+    where: { id },
     data: { resolvedAt: new Date() }
   });
 
@@ -110,9 +110,9 @@ export const resolveFraudAlert = async (req: Request, res: Response) => {
 };
 
 export const toggleUserStatus = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const user = await prisma.user.findUnique({ where: { id: id as string } });
+  const id = req.params.id as string;
+  const user = await prisma.user.findUnique({ where: { id } });
   if (!user) return sendSuccess(res, null);
-  const updated = await prisma.user.update({ where: { id: id as string }, data: { isActive: !user.isActive } });
+  const updated = await prisma.user.update({ where: { id }, data: { isActive: !user.isActive } });
   return sendSuccess(res, { isActive: updated.isActive });
 };
