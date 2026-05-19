@@ -146,7 +146,7 @@ function VoiceMessage({ src, isMe, sender, createdAt }: { src: string; isMe: boo
 
         {/* Cohesive Voice Sub-footer */}
         <div className={`flex items-center justify-between text-[10px] font-bold mt-1.5 select-none ${
-          isMe ? 'text-primary-container/70' : 'text-on-surface-variant/70'
+          isMe ? 'text-white/90' : 'text-on-surface-variant/70'
         }`}>
           <span>{isPlaying ? formatTime(currentTime) : formatTime(duration)}</span>
           <div className="flex items-center gap-1.5">
@@ -178,6 +178,38 @@ export default function ChatPage({ params }: { params: { orderId: string } }) {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Report Modal States
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [reportingMessage, setReportingMessage] = useState<any>(null);
+  const [reportReason, setReportReason] = useState('Inappropriate behavior/Language');
+  const [customReportReason, setCustomReportReason] = useState('');
+  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
+
+  const handleOpenReportModal = (msg: any) => {
+    setReportingMessage(msg);
+    setReportReason('Inappropriate behavior/Language');
+    setCustomReportReason('');
+    setReportModalOpen(true);
+  };
+
+  const handleSubmitReport = async () => {
+    if (!accessToken || !reportingMessage) return;
+    setIsSubmittingReport(true);
+    try {
+      const finalReason = reportReason === 'Other' 
+        ? `Other: ${customReportReason}` 
+        : reportReason;
+      
+      await chatApi.reportMessage(accessToken, orderId, reportingMessage.id, finalReason);
+      showToast('Incident reported successfully. Admin will take appropriate actions.', 'success');
+      setReportModalOpen(false);
+    } catch (err: any) {
+      showToast(err.message || 'Failed to submit report', 'error');
+    } finally {
+      setIsSubmittingReport(false);
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -396,7 +428,19 @@ export default function ChatPage({ params }: { params: { orderId: string } }) {
             const isAudio = hasMedia && isAudioUrl(msg.mediaUrl);
 
             return (
-              <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+              <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} items-center gap-2 group`}>
+                
+                {/* Custom Report Flag Button (Shown on hover for incoming messages) */}
+                {!isMe && (
+                  <button
+                    onClick={() => handleOpenReportModal(msg)}
+                    className="p-1.5 rounded-full hover:bg-error/10 text-on-surface-variant/40 hover:text-error transition-all duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 order-last"
+                    title="Report message to admin"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">flag</span>
+                  </button>
+                )}
+
                 {isAudio ? (
                   <VoiceMessage src={msg.mediaUrl} isMe={isMe} sender={msg.sender} createdAt={msg.createdAt} />
                 ) : (
@@ -422,7 +466,7 @@ export default function ChatPage({ params }: { params: { orderId: string } }) {
                       </div>
                     )}
 
-                    <div className={`text-[10px] mt-1 ${isMe ? 'text-primary-container/70' : 'text-on-surface-variant/70'} text-right`}>
+                    <div className={`text-[10px] mt-1 ${isMe ? 'text-white/90' : 'text-on-surface-variant/70'} text-right`}>
                       {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>
@@ -522,6 +566,86 @@ export default function ChatPage({ params }: { params: { orderId: string } }) {
           )}
         </div>
       </div>
+
+      {/* Report Fraud / Suspicious Activity Modal */}
+      {reportModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-surface border border-outline-variant/30 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center gap-3 text-error">
+              <span className="material-symbols-outlined text-3xl">warning</span>
+              <h2 className="text-xl font-bold">Report Message</h2>
+            </div>
+            
+            <p className="text-sm text-on-surface-variant">
+              You are flagging a message sent by <strong className="text-on-surface font-semibold">{reportingMessage?.sender?.name}</strong>. This incident will be routed directly to Fixaway administration for review and potential account suspension/fines.
+            </p>
+
+            {reportingMessage?.content && (
+              <div className="bg-surface-container-low p-3.5 rounded-xl border border-outline-variant/20 max-h-24 overflow-y-auto">
+                <p className="text-xs text-on-surface-variant font-semibold mb-1">Flagged Message Content:</p>
+                <p className="text-sm italic text-on-surface">"{reportingMessage.content}"</p>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Reason for Report</label>
+                <select 
+                  value={reportReason}
+                  onChange={(e) => setReportReason(e.target.value)}
+                  className="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                >
+                  <option value="Inappropriate behavior/Language">Inappropriate behavior / language</option>
+                  <option value="Circumventing platform payments / Cash deals">Circumventing platform payments / Cash deals</option>
+                  <option value="Fraudulent service activity">Fraudulent service activity</option>
+                  <option value="Spam or harassment">Spam or harassment</option>
+                  <option value="Other">Other suspicious activity</option>
+                </select>
+              </div>
+
+              {reportReason === 'Other' && (
+                <div>
+                  <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Describe custom reason</label>
+                  <textarea
+                    value={customReportReason}
+                    onChange={(e) => setCustomReportReason(e.target.value)}
+                    placeholder="Provide details about the issue..."
+                    rows={3}
+                    className="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-3">
+              <button 
+                onClick={() => setReportModalOpen(false)}
+                className="px-4 py-2.5 rounded-full hover:bg-surface-container-low text-on-surface-variant font-bold text-sm transition-colors"
+                disabled={isSubmittingReport}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleSubmitReport}
+                className="bg-error text-white px-5 py-2.5 rounded-full flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-md font-bold text-sm disabled:opacity-50"
+                disabled={isSubmittingReport || (reportReason === 'Other' && !customReportReason.trim())}
+              >
+                {isSubmittingReport ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Submitting...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-[18px]">flag</span>
+                    <span>Submit Report</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -36,3 +36,33 @@ export const sendMessage = async (req: any, res: Response) => {
 
   return sendCreated(res, message);
 };
+
+export const reportChat = async (req: any, res: Response) => {
+  const { orderId } = req.params;
+  const { reason, messageId } = req.body;
+
+  if (!reason) return sendError(res, 'Reason is required');
+
+  const order = await prisma.order.findUnique({ where: { id: orderId } });
+  if (!order) return sendError(res, 'Order not found', 404);
+
+  const reportedUserId = req.user.userId === order.customerId ? order.technicianId : order.customerId;
+
+  let finalDescription = `Reported by user (ID: ${req.user.userId}): ${reason}`;
+  if (messageId) {
+    const msg = await prisma.chatMessage.findUnique({ where: { id: messageId } });
+    if (msg) {
+      finalDescription += `\nFlagged Message: "${msg.content}" ${msg.mediaUrl ? `[Media: ${msg.mediaUrl}]` : ''}`;
+    }
+  }
+
+  const alert = await prisma.fraudAlert.create({
+    data: {
+      orderId,
+      type: 'SUSPICIOUS_ACTIVITY',
+      description: finalDescription,
+    },
+  });
+
+  return sendCreated(res, alert, 'Report submitted successfully to the admin');
+};

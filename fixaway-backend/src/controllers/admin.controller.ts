@@ -69,8 +69,44 @@ export const getFraudAlerts = async (req: Request, res: Response) => {
 
 export const resolveFraudAlert = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const alert = await prisma.fraudAlert.update({ where: { id: id as string }, data: { resolvedAt: new Date() } });
-  return sendSuccess(res, alert, 'Alert resolved');
+  const { action, reportedUserId, fineAmount } = req.body;
+
+  const alert = await prisma.fraudAlert.update({
+    where: { id: id as string },
+    data: { resolvedAt: new Date() }
+  });
+
+  if (reportedUserId) {
+    if (action === 'BAN') {
+      await prisma.user.update({
+        where: { id: reportedUserId },
+        data: { isActive: false }
+      });
+    } else if (action === 'FINE' && fineAmount > 0) {
+      await prisma.walletTransaction.create({
+        data: {
+          userId: reportedUserId,
+          type: 'DEBIT',
+          amount: Number(fineAmount),
+          description: `Fraud penalty for Alert #${id.slice(-6).toUpperCase()}`,
+          orderId: alert.orderId || undefined
+        }
+      });
+      // Deduct TechnicianProfile balance if role matches
+      const reportedUser = await prisma.user.findUnique({
+        where: { id: reportedUserId },
+        include: { technicianProfile: true }
+      });
+      if (reportedUser?.role === 'TECHNICIAN' && reportedUser.technicianProfile) {
+        await prisma.technicianProfile.update({
+          where: { id: reportedUser.technicianProfile.id },
+          data: { walletBalance: { decrement: Number(fineAmount) } }
+        });
+      }
+    }
+  }
+
+  return sendSuccess(res, alert, 'Alert resolved and punishment applied successfully');
 };
 
 export const toggleUserStatus = async (req: Request, res: Response) => {

@@ -183,7 +183,14 @@ export const adminApi = {
     request<{ success: boolean; data: any[] }>(`/admin/orders?page=${page}`, { token }),
 
   getFraudAlerts: (token: string) =>
-    request<{ success: boolean; data: any[] }>('/admin/fraud', { token }),
+    request<{ success: boolean; data: any[] }>('/admin/fraud-alerts', { token }),
+
+  resolveFraudAlert: (token: string, alertId: string, body?: { action: string; reportedUserId?: string; fineAmount?: number }) =>
+    request<{ success: boolean }>(`/admin/fraud-alerts/${alertId}/resolve`, {
+      method: 'PATCH',
+      token,
+      body: body ? JSON.stringify(body) : undefined,
+    }),
 
   getStats: (token: string) =>
     request<{ success: boolean; data: any }>('/admin/stats', { token }),
@@ -248,6 +255,13 @@ export const chatApi = {
       method: 'POST',
       token,
       body: JSON.stringify({ content, mediaUrl }),
+    }),
+
+  reportMessage: (token: string, orderId: string, messageId: string, reason: string) =>
+    request<{ success: boolean }>(`/chat/${orderId}/report`, {
+      method: 'POST',
+      token,
+      body: JSON.stringify({ messageId, reason }),
     }),
 };
 
