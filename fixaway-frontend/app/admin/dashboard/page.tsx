@@ -20,9 +20,25 @@ export default function AdminDashboardPage() {
             adminApi.getStats(accessToken),
             adminApi.getTechnicians(accessToken),
           ]);
-          if (statsRes.status === 'fulfilled' && statsRes.value.data) setStats(statsRes.value.data);
-          if (techsRes.status === 'fulfilled') {
-            const pending = techsRes.value.data?.filter((t: any) => t.verificationStatus === 'PENDING') ?? [];
+          if (statsRes.status === 'fulfilled' && statsRes.value.data) {
+            const rawStats = statsRes.value.data;
+            setStats({
+              revenue: rawStats.totalRevenue ?? 0,
+              activeOrders: rawStats.totalOrders ?? 0,
+              onlineTechs: rawStats.activeTechnicians ?? 0,
+              fraudAlerts: rawStats.fraudAlerts ?? 0,
+            });
+          }
+          if (techsRes.status === 'fulfilled' && techsRes.value.data) {
+            const rawTechs = Array.isArray(techsRes.value.data) ? techsRes.value.data : (techsRes.value.data as any)?.technicians || [];
+            const pending = rawTechs
+              .filter((t: any) => !t.isVerified)
+              .map((t: any) => ({
+                id: t.userId,
+                name: t.user?.name || 'Unknown',
+                specialty: t.specialties?.[0] || 'Technician',
+                status: 'PENDING',
+              }));
             setQueue(pending.slice(0, 5));
           }
         }

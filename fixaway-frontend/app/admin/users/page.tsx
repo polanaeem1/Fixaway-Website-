@@ -16,7 +16,7 @@ export default function AdminUsersPage() {
       try {
         if (accessToken) {
           const res = await adminApi.getUsers(accessToken);
-          setUsers(Array.isArray(res.data) ? res.data : []);
+          setUsers(Array.isArray(res.data) ? res.data : (res.data as any)?.users || []);
         }
       } catch (e) { console.error('Failed to load users', e); }
       finally { setLoading(false); }

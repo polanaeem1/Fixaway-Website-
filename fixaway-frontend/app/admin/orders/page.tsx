@@ -23,7 +23,7 @@ export default function AdminOrdersPage() {
       try {
         if (accessToken) {
           const res = await adminApi.getOrders(accessToken);
-          setOrders(Array.isArray(res.data) ? res.data : []);
+          setOrders(Array.isArray(res.data) ? res.data : (res.data as any)?.orders || []);
         }
       } catch (e) { console.error('Failed to load orders', e); }
       finally { setLoading(false); }

@@ -29,5 +29,10 @@ export const sendMessage = async (req: any, res: Response) => {
     include: { sender: { select: { id: true, name: true, avatarUrl: true, role: true } } },
   });
 
+  const io = req.app.get('io');
+  if (io) {
+    io.to(`order:${orderId}`).emit('message_received', message);
+  }
+
   return sendCreated(res, message);
 };

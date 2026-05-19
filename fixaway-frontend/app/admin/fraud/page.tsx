@@ -29,7 +29,26 @@ export default function AdminFraudPage() {
       try {
         if (accessToken) {
           const res = await adminApi.getFraudAlerts(accessToken);
-          setAlerts(Array.isArray(res.data) ? res.data : []);
+          const rawAlerts = Array.isArray(res.data) ? res.data : [];
+          
+          const mapped = rawAlerts.map((alert: any) => {
+            let risk = 'MEDIUM';
+            if (alert.type === 'LOCATION_MISMATCH') risk = 'HIGH';
+            if (alert.type === 'FAKE_COMPLETION') risk = 'CRITICAL';
+            if (alert.type === 'DOUBLE_BILLING') risk = 'HIGH';
+
+            const custName = alert.order?.customer?.name || 'Customer';
+            const techName = alert.order?.technician?.name || 'Technician';
+            const entity = alert.orderId ? `Order #${alert.orderId.slice(-8)} (${custName} & ${techName})` : 'Platform Activity';
+
+            return {
+              ...alert,
+              risk,
+              entity,
+            };
+          });
+
+          setAlerts(mapped);
         }
       } catch (e) { console.error('Failed to load fraud alerts', e); }
       finally { setLoading(false); }

@@ -243,11 +243,11 @@ export const chatApi = {
   getMessages: (token: string, orderId: string) =>
     request<{ success: boolean; data: any[] }>(`/chat/${orderId}`, { token }),
 
-  sendMessage: (token: string, orderId: string, content: string) =>
+  sendMessage: (token: string, orderId: string, content: string, mediaUrl?: string) =>
     request<{ success: boolean; data: any }>(`/chat/${orderId}`, {
       method: 'POST',
       token,
-      body: JSON.stringify({ content }),
+      body: JSON.stringify({ content, mediaUrl }),
     }),
 };
 
