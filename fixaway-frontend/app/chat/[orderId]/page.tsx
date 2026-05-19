@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
 import { chatApi, uploadApi } from '@/lib/api';
-import { getSocket } from '@/lib/socket';
+import { joinOrderRoom, leaveOrderRoom, onOrderMessage } from '@/lib/socket';
 import { useToast } from '@/components/ui/ToastProvider';
 
 function VoiceMessage({ src, isMe, sender, createdAt }: { src: string; isMe: boolean; sender: any; createdAt: string }) {
@@ -234,12 +234,14 @@ export default function ChatPage({ params }: { params: { orderId: string } }) {
 
     fetchMessages();
 
-    // Socket Setup
-    const socket = getSocket(accessToken);
-    socket.emit('join_order', orderId);
+    // Socket/Realtime Setup
+    joinOrderRoom(orderId);
 
     const handleReceiveMessage = (newMessage: any) => {
-      if (newMessage.orderId === orderId) {
+      // Supabase snake_case or Express camelCase compatibility
+      const msgOrderId = newMessage.orderId || newMessage.order_id;
+      
+      if (msgOrderId === orderId) {
         setMessages((prev) => {
           // Prevent duplicates
           if (prev.find((m) => m.id === newMessage.id)) return prev;
@@ -248,11 +250,11 @@ export default function ChatPage({ params }: { params: { orderId: string } }) {
       }
     };
 
-    socket.on('message_received', handleReceiveMessage);
+    const unsubscribe = onOrderMessage(orderId, handleReceiveMessage);
 
     return () => {
-      socket.emit('leave_order', orderId);
-      socket.off('message_received', handleReceiveMessage);
+      leaveOrderRoom(orderId);
+      unsubscribe();
     };
   }, [accessToken, orderId, router, showToast]);
 

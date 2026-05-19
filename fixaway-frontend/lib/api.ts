@@ -1,4 +1,8 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const isServerless = process.env.NEXT_PUBLIC_SERVERLESS === 'true';
+const API_BASE = isServerless
+  ? process.env.NEXT_PUBLIC_SUPABASE_FUNCTIONS_URL || 'https://wftbsondxhiaxmjacqmr.supabase.co/functions/v1'
+  : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+
 
 class ApiError extends Error {
   constructor(public status: number, message: string) {
