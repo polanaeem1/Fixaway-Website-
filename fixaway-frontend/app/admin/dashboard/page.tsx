@@ -33,10 +33,10 @@ export default function AdminDashboardPage() {
   }, [accessToken]);
 
   const kpis = [
-    { label: 'Total Revenue', value: `EGP ${(stats.revenue / 1000).toFixed(1)}K`, change: '+14.5%', up: true, icon: 'payments', color: 'text-primary' },
-    { label: 'Active Orders', value: stats.activeOrders.toLocaleString(), change: '+5.2%', up: true, icon: 'pending_actions', color: 'text-blue-600' },
-    { label: 'Online Techs', value: stats.onlineTechs.toString(), pct: 65, icon: 'engineering', color: 'text-green-600' },
-    { label: 'Fraud Alerts', value: stats.fraudAlerts.toString(), icon: 'warning', color: 'text-error', urgent: true },
+    { label: 'Total Revenue', value: `EGP ${((stats?.revenue ?? 0) / 1000).toFixed(1)}K`, change: '+14.5%', up: true, icon: 'payments', color: 'text-primary' },
+    { label: 'Active Orders', value: (stats?.activeOrders ?? 0).toLocaleString(), change: '+5.2%', up: true, icon: 'pending_actions', color: 'text-blue-600' },
+    { label: 'Online Techs', value: (stats?.onlineTechs ?? 0).toString(), pct: 65, icon: 'engineering', color: 'text-green-600' },
+    { label: 'Fraud Alerts', value: (stats?.fraudAlerts ?? 0).toString(), icon: 'warning', color: 'text-error', urgent: true },
   ];
 
   const barHeights = ['40%', '60%', '50%', '80%', '70%', '90%', '95%'];
