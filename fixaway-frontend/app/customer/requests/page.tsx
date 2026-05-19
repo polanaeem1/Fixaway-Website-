@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuthStore } from '@/store/auth.store';
 import { requestsApi, quotationsApi } from '@/lib/api';
-import { getSocket } from '@/lib/socket';
+import { getSocket, onUserEvent } from '@/lib/socket';
 import { useToast } from '@/components/ui/ToastProvider';
 import ReviewModal from '@/components/ui/ReviewModal';
 
@@ -15,7 +15,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function CustomerRequestsPage() {
-  const { accessToken } = useAuthStore();
+  const { accessToken, user } = useAuthStore();
   const { showToast } = useToast();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,15 +36,16 @@ export default function CustomerRequestsPage() {
     fetchData();
     const handleVisibility = () => { if (document.visibilityState === 'visible') fetchData(); };
     document.addEventListener('visibilitychange', handleVisibility);
-    if (accessToken) {
-      const socket = getSocket(accessToken);
+    if (accessToken && user) {
       const handleNewQuotation = async (quotation: any) => {
         showToast(`💬 New quote of EGP ${quotation.price} received!`, 'success');
         await fetchData();
       };
-      socket.on('new_quotation', handleNewQuotation);
+      
+      const unsubQuote = onUserEvent(user.id, 'new_quotation', handleNewQuotation);
+      
       return () => {
-        socket.off('new_quotation', handleNewQuotation);
+        unsubQuote();
         document.removeEventListener('visibilitychange', handleVisibility);
       };
     }

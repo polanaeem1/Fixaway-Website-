@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
 import { walletApi, requestsApi, ordersApi, quotationsApi } from '@/lib/api';
-import { getSocket } from '@/lib/socket';
+import { getSocket, onUserEvent, onTechnicianEvent } from '@/lib/socket';
 import { useToast } from '@/components/ui/ToastProvider';
 
 const statusColors: Record<string, string> = {
@@ -64,9 +64,7 @@ export default function CustomerDashboardPage() {
     document.addEventListener('visibilitychange', handleVisibility);
 
     // Socket: listen for new quotations from technicians
-    if (accessToken) {
-      const socket = getSocket(accessToken);
-
+    if (accessToken && user) {
       const handleNewQuotation = async (quotation: any) => {
         console.log('[Socket] new_quotation received:', quotation);
         showToast(`💬 New quote of EGP ${quotation.price} received! Check your requests.`, 'success');
@@ -79,12 +77,12 @@ export default function CustomerDashboardPage() {
         fetchData();
       };
 
-      socket.on('new_quotation', handleNewQuotation);
-      socket.on('new_request', handleNewRequest);
+      const unsubQuote = onUserEvent(user.id, 'new_quotation', handleNewQuotation);
+      const unsubReq = onTechnicianEvent('new_request', handleNewRequest);
 
       return () => {
-        socket.off('new_quotation', handleNewQuotation);
-        socket.off('new_request', handleNewRequest);
+        unsubQuote();
+        unsubReq();
         document.removeEventListener('visibilitychange', handleVisibility);
       };
     }

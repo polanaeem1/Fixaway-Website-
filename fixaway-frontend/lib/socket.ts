@@ -97,15 +97,72 @@ export function disconnectSocket() {
   }
 }
 
+// ─── Generalized User/Technician Subscriptions ────────────────────────────────
+
+export function onUserEvent(
+  userId: string,
+  event: string,
+  callback: (payload: any) => void
+): () => void {
+  if (isServerless) {
+    const sb = getSupabaseClient();
+    const channelName = `user:${userId}`;
+    let channel = activeChannels.get(channelName);
+    if (!channel) {
+      channel = sb.channel(channelName);
+      activeChannels.set(channelName, channel);
+    }
+    channel.on('broadcast', { event }, ({ payload }) => {
+      callback(payload);
+    });
+    if (channel.state !== 'joined') channel.subscribe();
+    return () => {
+      sb.removeChannel(channel!);
+      activeChannels.delete(channelName);
+    };
+  } else {
+    const s = getSocket();
+    s?.on(event, callback);
+    return () => s?.off(event, callback);
+  }
+}
+
+export function onTechnicianEvent(
+  event: string,
+  callback: (payload: any) => void
+): () => void {
+  if (isServerless) {
+    const sb = getSupabaseClient();
+    const channelName = 'technicians';
+    let channel = activeChannels.get(channelName);
+    if (!channel) {
+      channel = sb.channel(channelName);
+      activeChannels.set(channelName, channel);
+    }
+    channel.on('broadcast', { event }, ({ payload }) => {
+      callback(payload);
+    });
+    if (channel.state !== 'joined') channel.subscribe();
+    return () => {
+      sb.removeChannel(channel!);
+      activeChannels.delete(channelName);
+    };
+  } else {
+    const s = getSocket();
+    s?.on(event, callback);
+    return () => s?.off(event, callback);
+  }
+}
+
 // ─── Socket.io path (only loaded when NOT serverless) ───────────────────────
 
 let _socket: any = null;
 
-function getSocket(): any {
+export function getSocket(): any {
   if (isServerless) return null;
   if (!_socket) {
-    // Dynamic import so socket.io-client is not bundled in serverless builds
-    throw new Error('Call initSocket(token) first in non-serverless mode');
+    console.warn('Call initSocket(token) first in non-serverless mode');
+    return null;
   }
   return _socket;
 }

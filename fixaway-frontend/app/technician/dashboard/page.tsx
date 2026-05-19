@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
 import { walletApi, requestsApi, technicianApi, quotationsApi, ordersApi } from '@/lib/api';
-import { getSocket } from '@/lib/socket';
+import { getSocket, onUserEvent, onTechnicianEvent } from '@/lib/socket';
 import { useToast } from '@/components/ui/ToastProvider';
 import dynamic from 'next/dynamic';
 
@@ -73,9 +73,7 @@ export default function TechnicianDashboardPage() {
     const handleVisibility = () => { if (document.visibilityState === 'visible') fetchData(); };
     document.addEventListener('visibilitychange', handleVisibility);
 
-    if (accessToken) {
-      const socket = getSocket(accessToken);
-
+    if (accessToken && user) {
       const handleNewRequest = (newRequest: any) => {
         setRequests(prev => {
           // Avoid duplicate if already in list
@@ -91,12 +89,12 @@ export default function TechnicianDashboardPage() {
         fetchData();
       };
 
-      socket.on('new_request', handleNewRequest);
-      socket.on('quotation_accepted', handleQuotationAccepted);
+      const unsubReq = onTechnicianEvent('new_request', handleNewRequest);
+      const unsubQuote = onUserEvent(user.id, 'quotation_accepted', handleQuotationAccepted);
 
       return () => {
-        socket.off('new_request', handleNewRequest);
-        socket.off('quotation_accepted', handleQuotationAccepted);
+        unsubReq();
+        unsubQuote();
         document.removeEventListener('visibilitychange', handleVisibility);
       };
     }
