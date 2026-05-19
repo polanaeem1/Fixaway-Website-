@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuthStore } from '@/store/auth.store';
 import { requestsApi, quotationsApi } from '@/lib/api';
-import { getSocket, onUserEvent } from '@/lib/socket';
+import { onUserEvent } from '@/lib/socket';
 import { useToast } from '@/components/ui/ToastProvider';
 import ReviewModal from '@/components/ui/ReviewModal';
 

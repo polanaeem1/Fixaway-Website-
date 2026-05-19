@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
 import { walletApi, requestsApi, technicianApi, quotationsApi, ordersApi } from '@/lib/api';
-import { getSocket, onUserEvent, onTechnicianEvent } from '@/lib/socket';
+import { onUserEvent, onTechnicianEvent } from '@/lib/socket';
 import { useToast } from '@/components/ui/ToastProvider';
 import dynamic from 'next/dynamic';
 

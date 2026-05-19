@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
 import { walletApi, requestsApi, ordersApi, quotationsApi } from '@/lib/api';
-import { getSocket, onUserEvent, onTechnicianEvent } from '@/lib/socket';
+import { onUserEvent, onTechnicianEvent } from '@/lib/socket';
 import { useToast } from '@/components/ui/ToastProvider';
 
 const statusColors: Record<string, string> = {
