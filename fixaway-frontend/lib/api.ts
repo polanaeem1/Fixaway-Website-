@@ -1,4 +1,4 @@
-const isServerless = process.env.NEXT_PUBLIC_SERVERLESS === 'true';
+const isServerless = process.env.NEXT_PUBLIC_SERVERLESS !== 'false';
 const API_BASE = isServerless
   ? process.env.NEXT_PUBLIC_SUPABASE_FUNCTIONS_URL || 'https://wftbsondxhiaxmjacqmr.supabase.co/functions/v1'
   : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';

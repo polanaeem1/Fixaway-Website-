@@ -9,9 +9,9 @@
 
 import { createClient, RealtimeChannel } from '@supabase/supabase-js';
 
-const isServerless = process.env.NEXT_PUBLIC_SERVERLESS === 'true';
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const isServerless = process.env.NEXT_PUBLIC_SERVERLESS !== 'false';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://wftbsondxhiaxmjacqmr.supabase.co';
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_VPf5eSwTX5J0KwG3JTExNA_aEs-JiTJ';
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:4000';
 
 // ─── Supabase Realtime path ─────────────────────────────────────────────────
