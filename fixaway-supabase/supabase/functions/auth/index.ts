@@ -3,7 +3,7 @@ import { adminDb, ok, created, err, getPathSegments, genId } from '../_shared/db
 import { requireAuth, signAccessToken, signRefreshToken, verifyRefreshToken } from '../_shared/auth.ts';
 
 // bcrypt via npm compat shim
-import { hash, compare } from 'https://esm.sh/bcryptjs@2.4.3';
+import bcrypt from 'npm:bcryptjs@2.4.3';
 
 Deno.serve(async (req: Request) => {
   const cors = handleCors(req);
@@ -25,7 +25,7 @@ Deno.serve(async (req: Request) => {
       if (existingPhone) return err('Phone number already registered', 409);
     }
 
-    const passwordHash = await hash(password, 12);
+    const passwordHash = await bcrypt.hash(password, 12);
     const allowedRoles = ['CUSTOMER', 'TECHNICIAN'];
     const userRole = allowedRoles.includes(role) ? role : 'CUSTOMER';
     const userId = genId();
@@ -58,7 +58,7 @@ Deno.serve(async (req: Request) => {
 
     if (!user || !user.is_active) return err('Invalid credentials', 401);
 
-    const valid = await compare(password, user.password_hash);
+    const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) return err('Invalid credentials', 401);
 
     const tokenPayload = { userId: user.id, role: user.role, email: user.email };
@@ -110,7 +110,7 @@ Deno.serve(async (req: Request) => {
     if (name) updateData.name = name;
     if (phone !== undefined) updateData.phone = phone || null;
     if (avatarUrl !== undefined) updateData.avatar_url = avatarUrl || null;
-    if (password) updateData.password_hash = await hash(password, 12);
+    if (password) updateData.password_hash = await bcrypt.hash(password, 12);
 
     const { data: user, error: updateErr } = await adminDb.from('users')
       .update(updateData).eq('id', authResult.userId)

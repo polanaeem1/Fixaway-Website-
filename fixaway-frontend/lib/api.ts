@@ -34,7 +34,7 @@ async function request<T>(
   const data = await res.json();
 
   if (!res.ok) {
-    throw new ApiError(res.status, data.message || 'Something went wrong');
+    throw new ApiError(res.status, data.message || data.error || 'Something went wrong');
   }
 
   return data;
@@ -220,7 +220,7 @@ export const uploadApi = {
     const data = await res.json();
 
     if (!res.ok) {
-      throw new ApiError(res.status, data.message || 'Upload failed');
+      throw new ApiError(res.status, data.message || data.error || 'Upload failed');
     }
 
     return data.data.url as string;
