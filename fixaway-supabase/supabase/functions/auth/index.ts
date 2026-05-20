@@ -38,7 +38,11 @@ Deno.serve(async (req: Request) => {
     if (userErr) return err(`Failed to create user: ${userErr.message}`, 500);
 
     if (userRole === 'TECHNICIAN') {
-      await adminDb.from('technician_profiles').insert({ id: genId(), userId: userId });
+      await adminDb.from('technician_profiles').insert({ 
+        id: genId(), 
+        userId: userId,
+        updatedAt: new Date().toISOString()
+      });
     }
 
     const tokenPayload = { userId: user.id, role: user.role, email: user.email };

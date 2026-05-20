@@ -120,16 +120,16 @@ export default function TechnicianWalletPage() {
             transactions.map((t: any) => (
               <div key={t.id} className="px-5 py-4 flex items-center justify-between hover:bg-surface-container-lowest transition-colors">
                 <div className="flex items-center gap-4">
-                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${t.amount > 0 ? 'bg-green-50 text-green-600' : 'bg-primary-container text-primary'}`}>
-                    <span className="material-symbols-outlined text-[22px]">{t.amount > 0 ? 'handyman' : 'account_balance'}</span>
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${t.type === 'CREDIT' ? 'bg-green-50 text-green-600' : 'bg-primary-container text-primary'}`}>
+                    <span className="material-symbols-outlined text-[22px]">{t.type === 'CREDIT' ? 'handyman' : 'account_balance'}</span>
                   </div>
                   <div>
                     <p className="font-semibold text-on-surface text-sm">{t.description || 'Transaction'}</p>
                     <p className="text-xs text-on-surface-variant">{new Date(t.createdAt).toLocaleDateString()} · {t.id?.slice(0, 8)}</p>
                   </div>
                 </div>
-                <span className={`font-bold text-base ${t.amount > 0 ? 'text-green-600' : 'text-on-surface'}`}>
-                  {t.amount > 0 ? '+' : ''}{t.amount?.toLocaleString()} EGP
+                <span className={`font-bold text-base ${t.type === 'CREDIT' ? 'text-green-600' : 'text-on-surface'}`}>
+                  {t.type === 'CREDIT' ? '+' : '-'}{t.amount?.toLocaleString()} EGP
                 </span>
               </div>
             ))
