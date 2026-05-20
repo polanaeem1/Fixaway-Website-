@@ -39,6 +39,10 @@ export const acceptQuotation = async (req: any, res: Response) => {
   if (!quotation) return sendError(res, 'Quotation not found', 404);
   if (quotation.request.customerId !== req.user.userId) return sendError(res, 'Unauthorized', 403);
 
+  if (['ACCEPTED', 'IN_PROGRESS', 'COMPLETED'].includes(quotation.request.status)) {
+    return sendError(res, 'An order has already been created for this request', 400);
+  }
+
   // Reject all other quotations for this request
   await prisma.quotation.updateMany({
     where: { requestId: quotation.requestId, id: { not: id } },

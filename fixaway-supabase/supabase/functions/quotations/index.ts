@@ -63,10 +63,15 @@ Deno.serve(async (req: Request) => {
 
     const id = segments[segments.length - 2];
     const { data: quotation } = await adminDb.from('quotations')
-      .select('*, service_requests!requestId(id, customerId)')
+      .select('*, service_requests!requestId(id, customerId, status)')
       .eq('id', id).maybeSingle();
     if (!quotation) return err('Quotation not found', 404);
     if (quotation.service_requests.customerId !== authResult.userId) return err('Unauthorized', 403);
+
+    const status = quotation.service_requests.status;
+    if (status === 'ACCEPTED' || status === 'IN_PROGRESS' || status === 'COMPLETED') {
+      return err('An order has already been created for this request', 400);
+    }
 
     // Reject all other quotations for the same request
     await adminDb.from('quotations')
