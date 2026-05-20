@@ -175,16 +175,16 @@ export const adminApi = {
     ),
 
   getTechnicians: (token: string) =>
-    request<{ success: boolean; data: any[] }>('/admin/technicians', { token }),
+    request<{ success: boolean; data: any[] }>('/technicians', { token }),
 
   verifyTechnician: (token: string, techId: string) =>
-    request<{ success: boolean }>(`/admin/technicians/${techId}/verify`, {
+    request<{ success: boolean }>(`/technicians/${techId}/verify`, {
       method: 'PATCH',
       token,
     }),
 
   getOrders: (token: string, page = 1) =>
-    request<{ success: boolean; data: any[] }>(`/admin/orders?page=${page}`, { token }),
+    request<{ success: boolean; data: any[] }>(`/orders/all?page=${page}`, { token }),
 
   getFraudAlerts: (token: string) =>
     request<{ success: boolean; data: any[] }>('/admin/fraud-alerts', { token }),

@@ -8,7 +8,7 @@ import { adminApi } from '@/lib/api';
 
 export default function AdminDashboardPage() {
   const { accessToken } = useAuthStore();
-  const [stats, setStats] = useState({ revenue: 0, activeOrders: 0, onlineTechs: 0, fraudAlerts: 0 });
+  const [stats, setStats] = useState({ revenue: 0, activeOrders: 0, onlineTechs: 0, fraudAlerts: 0, totalUsers: 0, totalTechs: 0 });
   const [queue, setQueue] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,6 +27,8 @@ export default function AdminDashboardPage() {
               activeOrders: rawStats.totalOrders ?? 0,
               onlineTechs: rawStats.activeTechnicians ?? 0,
               fraudAlerts: rawStats.fraudAlerts ?? 0,
+              totalUsers: rawStats.totalUsers ?? 0,
+              totalTechs: rawStats.totalTechnicians ?? 0,
             });
           }
           if (techsRes.status === 'fulfilled' && techsRes.value.data) {
@@ -152,9 +154,9 @@ export default function AdminDashboardPage() {
       {/* Quick Nav Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { href: '/admin/users', icon: 'group', label: 'Manage Users', count: '14.8K', color: 'bg-primary-container text-on-primary-container' },
-          { href: '/admin/technicians', icon: 'engineering', label: 'Technicians', count: '527', color: 'bg-secondary-container text-on-secondary-container' },
-          { href: '/admin/orders', icon: 'receipt_long', label: 'All Orders', count: '48.4K', color: 'bg-surface-container-high text-on-surface' },
+          { href: '/admin/users', icon: 'group', label: 'Manage Users', count: loading ? '—' : stats.totalUsers.toLocaleString(), color: 'bg-primary-container text-on-primary-container' },
+          { href: '/admin/technicians', icon: 'engineering', label: 'Technicians', count: loading ? '—' : stats.totalTechs.toLocaleString(), color: 'bg-secondary-container text-on-secondary-container' },
+          { href: '/admin/orders', icon: 'receipt_long', label: 'All Orders', count: loading ? '—' : stats.activeOrders.toLocaleString(), color: 'bg-surface-container-high text-on-surface' },
           { href: '/admin/fraud', icon: 'security', label: 'Security Alerts', count: `${stats.fraudAlerts} Active`, color: 'bg-error/10 text-error' },
         ].map(card => (
           <Link key={card.href} href={card.href}

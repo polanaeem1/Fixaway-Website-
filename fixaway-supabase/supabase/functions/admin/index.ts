@@ -22,22 +22,26 @@ Deno.serve(async (req: Request) => {
       { count: fraudAlerts },
       { data: recentOrders },
       { data: completedOrders },
+      { count: totalUsers },
+      { count: totalTechnicians },
     ] = await Promise.all([
       adminDb.from('orders').select('*', { count: 'exact', head: true }),
-      adminDb.from('technician_profiles').select('*', { count: 'exact', head: true }).eq('is_online', true),
-      adminDb.from('technician_profiles').select('*', { count: 'exact', head: true }).eq('is_verified', false),
-      adminDb.from('fraud_alerts').select('*', { count: 'exact', head: true }).is('resolved_at', null),
+      adminDb.from('technician_profiles').select('*', { count: 'exact', head: true }).eq('isOnline', true),
+      adminDb.from('technician_profiles').select('*', { count: 'exact', head: true }).eq('isVerified', false),
+      adminDb.from('fraud_alerts').select('*', { count: 'exact', head: true }).is('resolvedAt', null),
       adminDb.from('orders').select(`
-        id, status, total_amount, created_at,
-        users!customer_id(id, name),
-        users!technician_id(id, name),
-        service_requests!request_id(*, categories(*))
-      `).order('created_at', { ascending: false }).limit(5),
-      adminDb.from('orders').select('total_amount').eq('status', 'COMPLETED'),
+        id, status, totalAmount, createdAt,
+        customer:users!customerId(id, name),
+        technician:users!technicianId(id, name),
+        serviceRequest:service_requests!requestId(*, category:categories(name))
+      `).order('createdAt', { ascending: false }).limit(5),
+      adminDb.from('orders').select('totalAmount').eq('status', 'COMPLETED'),
+      adminDb.from('users').select('*', { count: 'exact', head: true }),
+      adminDb.from('technician_profiles').select('*', { count: 'exact', head: true }),
     ]);
 
     const totalRevenue = (completedOrders ?? []).reduce(
-      (a: number, o: any) => a + o.total_amount * 0.15, 0,
+      (a: number, o: any) => a + o.totalAmount * 0.15, 0,
     );
 
     return ok({
@@ -47,6 +51,8 @@ Deno.serve(async (req: Request) => {
       fraudAlerts: fraudAlerts ?? 0,
       totalRevenue: Math.round(totalRevenue * 100) / 100,
       recentOrders: recentOrders ?? [],
+      totalUsers: totalUsers ?? 0,
+      totalTechnicians: totalTechnicians ?? 0,
     });
   }
 
@@ -57,14 +63,23 @@ Deno.serve(async (req: Request) => {
     const role = q.get('role');
 
     let query = adminDb.from('users').select(
-      'id, name, email, phone, role, is_active, created_at, technician_profiles(*)',
+      'id, name, email, phone, role, isActive, createdAt, technician_profiles(*)',
       { count: 'exact' },
     );
     if (role) query = query.eq('role', role);
 
     const { data, count } = await query
-      .order('created_at', { ascending: false })
+      .order('createdAt', { ascending: false })
       .range((page - 1) * limit, page * limit - 1);
+
+    if (data) {
+      data.forEach((user: any) => {
+        if (user.technician_profiles) {
+          user.technicianProfile = user.technician_profiles[0] || null;
+          delete user.technician_profiles;
+        }
+      });
+    }
 
     return ok({ users: data ?? [], total: count ?? 0 });
   }
@@ -72,23 +87,23 @@ Deno.serve(async (req: Request) => {
   // PATCH /admin/users/:id/toggle
   if (method === 'PATCH' && segments.at(-1) === 'toggle') {
     const id = segments[segments.length - 2];
-    const { data: user } = await adminDb.from('users').select('id, is_active').eq('id', id).maybeSingle();
+    const { data: user } = await adminDb.from('users').select('id, isActive').eq('id', id).maybeSingle();
     if (!user) return ok(null);
     const { data: updated } = await adminDb.from('users')
-      .update({ is_active: !user.is_active }).eq('id', id).select('is_active').single();
-    return ok({ isActive: updated?.is_active });
+      .update({ isActive: !user.isActive, updatedAt: new Date().toISOString() }).eq('id', id).select('isActive').single();
+    return ok({ isActive: updated?.isActive });
   }
 
   // GET /admin/fraud-alerts
   if (method === 'GET' && segments.at(-1) === 'fraud-alerts') {
     const { data: alerts } = await adminDb.from('fraud_alerts').select(`
       *,
-      orders!order_id(
-        id, customer_id, technician_id,
-        users!customer_id(id, name),
-        users!technician_id(id, name)
+      order:orders!orderId(
+        id, customerId, technicianId,
+        customer:users!customerId(id, name),
+        technician:users!technicianId(id, name)
       )
-    `).is('resolved_at', null).order('created_at', { ascending: false });
+    `).is('resolvedAt', null).order('createdAt', { ascending: false });
 
     return ok(alerts ?? []);
   }
@@ -100,7 +115,7 @@ Deno.serve(async (req: Request) => {
     const { action, reportedUserId, fineAmount } = body;
 
     const { data: alert, error: alertErr } = await adminDb.from('fraud_alerts')
-      .update({ resolved_at: new Date().toISOString() })
+      .update({ resolvedAt: new Date().toISOString() })
       .eq('id', alertId)
       .select()
       .single();
@@ -109,12 +124,12 @@ Deno.serve(async (req: Request) => {
 
     if (reportedUserId) {
       if (action === 'BAN') {
-        await adminDb.from('users').update({ is_active: false }).eq('id', reportedUserId);
+        await adminDb.from('users').update({ isActive: false, updatedAt: new Date().toISOString() }).eq('id', reportedUserId);
       } else if (action === 'FINE' && fineAmount > 0) {
         await adminDb.from('wallet_transactions').insert({
           id: genId(),
-          user_id: reportedUserId,
-          order_id: alert.order_id ?? null,
+          userId: reportedUserId,
+          orderId: alert.orderId ?? null,
           type: 'DEBIT',
           amount: Number(fineAmount),
           description: `Fraud penalty for Alert #${alertId.slice(-6).toUpperCase()}`,
@@ -122,11 +137,11 @@ Deno.serve(async (req: Request) => {
 
         // Deduct from technician wallet balance if applicable
         const { data: techProfile } = await adminDb.from('technician_profiles')
-          .select('wallet_balance').eq('user_id', reportedUserId).maybeSingle();
+          .select('walletBalance').eq('userId', reportedUserId).maybeSingle();
         if (techProfile) {
           await adminDb.from('technician_profiles').update({
-            wallet_balance: Math.max(0, (techProfile.wallet_balance ?? 0) - Number(fineAmount)),
-          }).eq('user_id', reportedUserId);
+            walletBalance: Math.max(0, (techProfile.walletBalance ?? 0) - Number(fineAmount)),
+          }).eq('userId', reportedUserId);
         }
       }
     }
@@ -141,18 +156,18 @@ Deno.serve(async (req: Request) => {
       { data: topTechs },
       { data: categories },
     ] = await Promise.all([
-      adminDb.from('orders').select('total_amount, status'),
+      adminDb.from('orders').select('totalAmount, status'),
       adminDb.from('technician_profiles').select(`
-        rating, total_jobs,
-        users!user_id(id, name, avatar_url)
+        rating, totalJobs,
+        user:users!userId(id, name, avatarUrl)
       `).order('rating', { ascending: false }).limit(5),
-      adminDb.from('service_requests').select('categories(name)'),
+      adminDb.from('service_requests').select('category:categories(name)'),
     ]);
 
     const completed = (orders ?? []).filter((o: any) => o.status === 'COMPLETED');
-    const totalRevenue = completed.reduce((a: number, o: any) => a + o.total_amount * 0.15, 0);
+    const totalRevenue = completed.reduce((a: number, o: any) => a + o.totalAmount * 0.15, 0);
     const avgOrderValue = completed.length > 0
-      ? completed.reduce((a: number, o: any) => a + o.total_amount, 0) / completed.length
+      ? completed.reduce((a: number, o: any) => a + o.totalAmount, 0) / completed.length
       : 0;
     const completionRate = (orders ?? []).length > 0
       ? (completed.length / (orders ?? []).length) * 100
@@ -161,7 +176,7 @@ Deno.serve(async (req: Request) => {
     // Category breakdown
     const catCounts: Record<string, number> = {};
     for (const r of categories ?? []) {
-      const name = (r as any).categories?.name ?? 'Other';
+      const name = (r as any).category?.name ?? 'Other';
       catCounts[name] = (catCounts[name] ?? 0) + 1;
     }
 

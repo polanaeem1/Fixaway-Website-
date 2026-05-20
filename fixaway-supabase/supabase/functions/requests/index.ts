@@ -21,16 +21,17 @@ Deno.serve(async (req: Request) => {
 
     const { data: request, error: reqErr } = await adminDb.from('service_requests').insert({
       id: genId(),
-      customer_id: authResult.userId,
-      category_id: categoryId ?? null,
+      customerId: authResult.userId,
+      categoryId: categoryId ?? null,
       type: type ?? 'HOME',
       title,
       description,
-      media_urls: mediaUrls ?? [],
+      mediaUrls: mediaUrls ?? [],
       lat: lat ?? null,
       lng: lng ?? null,
       address: address ?? null,
-    }).select(`*, categories(*), users!customer_id(id, name, avatar_url)`).single();
+      updatedAt: new Date().toISOString()
+    }).select(`*, categories(*), users!customerId(id, name, avatarUrl)`).single();
 
     if (reqErr) return err(`Failed to create request: ${reqErr.message}`, 500);
 
@@ -56,11 +57,11 @@ Deno.serve(async (req: Request) => {
     const status = q.get('status');
 
     let query = adminDb.from('service_requests')
-      .select('*, categories(*), users!customer_id(id, name, email), orders(*)', { count: 'exact' });
+      .select('*, categories(*), users!customerId(id, name, email), orders(*)', { count: 'exact' });
     if (status) query = query.eq('status', status);
 
     const { data, count } = await query
-      .order('created_at', { ascending: false })
+      .order('createdAt', { ascending: false })
       .range((page - 1) * limit, page * limit - 1);
 
     return ok({ requests: data ?? [], total: count ?? 0 });
@@ -72,9 +73,9 @@ Deno.serve(async (req: Request) => {
     if (authResult instanceof Response) return authResult;
 
     const { data } = await adminDb.from('service_requests')
-      .select('*, categories(*), users!customer_id(id, name, avatar_url)')
+      .select('*, categories(*), users!customerId(id, name, avatarUrl)')
       .eq('status', 'PENDING')
-      .order('created_at', { ascending: false })
+      .order('createdAt', { ascending: false })
       .limit(50);
 
     return ok(data ?? []);
@@ -86,12 +87,23 @@ Deno.serve(async (req: Request) => {
     const { data } = await adminDb.from('service_requests')
       .select(`
         *, categories(*),
-        users!customer_id(id, name, avatar_url, phone),
-        quotations(*, users!technician_id(id, name, avatar_url, technician_profiles(*))),
+        users!customerId(id, name, avatarUrl, phone),
+        quotations(*, users!technicianId(id, name, avatarUrl, technician_profiles(*))),
         orders(*)
       `)
       .eq('id', id).maybeSingle();
     if (!data) return err('Request not found', 404);
+
+    if (data.quotations) {
+      data.quotations = data.quotations.map((q: any) => {
+        if (q.users && q.users.technician_profiles) {
+          q.users.technicianProfile = q.users.technician_profiles[0] || null;
+          delete q.users.technician_profiles;
+        }
+        return q;
+      });
+    }
+
     return ok(data);
   }
 
@@ -102,15 +114,15 @@ Deno.serve(async (req: Request) => {
 
     const id = segments[segments.length - 2];
     const { data: request } = await adminDb.from('service_requests')
-      .select('id, customer_id, status').eq('id', id).maybeSingle();
+      .select('id, customerId, status').eq('id', id).maybeSingle();
     if (!request) return err('Request not found', 404);
-    if (request.customer_id !== authResult.userId) return err('Unauthorized', 403);
+    if (request.customerId !== authResult.userId) return err('Unauthorized', 403);
     if (['IN_PROGRESS', 'COMPLETED'].includes(request.status)) {
       return err('Cannot cancel this request');
     }
 
     const { data: updated } = await adminDb.from('service_requests')
-      .update({ status: 'CANCELLED' }).eq('id', id).select().single();
+      .update({ status: 'CANCELLED', updatedAt: new Date().toISOString() }).eq('id', id).select().single();
 
     return ok(updated, 'Request cancelled');
   }
@@ -127,15 +139,15 @@ Deno.serve(async (req: Request) => {
     let query = adminDb.from('service_requests')
       .select(`
         *, categories(*),
-        quotations(*, users!technician_id(id, name, avatar_url)),
-        orders(*, reviews(*), users!technician_id(id, name))
+        quotations(*, users!technicianId(id, name, avatarUrl)),
+        orders(*, reviews(*), users!technicianId(id, name))
       `, { count: 'exact' })
-      .eq('customer_id', authResult.userId);
+      .eq('customerId', authResult.userId);
 
     if (status) query = query.eq('status', status);
 
     const { data, count } = await query
-      .order('created_at', { ascending: false })
+      .order('createdAt', { ascending: false })
       .range((page - 1) * limit, page * limit - 1);
 
     return ok({ requests: data ?? [], total: count ?? 0 });

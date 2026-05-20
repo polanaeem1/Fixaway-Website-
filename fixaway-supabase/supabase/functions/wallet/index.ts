@@ -19,9 +19,9 @@ Deno.serve(async (req: Request) => {
     const limit = Number(q.get('limit') ?? 20);
 
     const { data: transactions, count } = await adminDb.from('wallet_transactions')
-      .select('*, orders!order_id(id)', { count: 'exact' })
-      .eq('user_id', authResult.userId)
-      .order('created_at', { ascending: false })
+      .select('*, order:orders!orderId(id)', { count: 'exact' })
+      .eq('userId', authResult.userId)
+      .order('createdAt', { ascending: false })
       .range((page - 1) * limit, page * limit - 1);
 
     return ok({ transactions: transactions ?? [], total: count ?? 0 });
@@ -34,10 +34,10 @@ Deno.serve(async (req: Request) => {
     sevenDaysAgo.setHours(0, 0, 0, 0);
 
     const { data: txns } = await adminDb.from('wallet_transactions')
-      .select('amount, created_at')
-      .eq('user_id', authResult.userId)
+      .select('amount, createdAt')
+      .eq('userId', authResult.userId)
       .eq('type', 'CREDIT')
-      .gte('created_at', sevenDaysAgo.toISOString());
+      .gte('createdAt', sevenDaysAgo.toISOString());
 
     const dailyTotals = Array(7).fill(0);
     let todayTotal = 0;
@@ -45,7 +45,7 @@ Deno.serve(async (req: Request) => {
     today.setHours(0, 0, 0, 0);
 
     for (const tx of txns ?? []) {
-      const txDate = new Date(tx.created_at);
+      const txDate = new Date(tx.createdAt);
       txDate.setHours(0, 0, 0, 0);
       const diffDays = Math.floor((today.getTime() - txDate.getTime()) / (1000 * 60 * 60 * 24));
       if (diffDays >= 0 && diffDays < 7) {
@@ -67,7 +67,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: transaction, error: txErr } = await adminDb.from('wallet_transactions').insert({
       id: genId(),
-      user_id: authResult.userId,
+      userId: authResult.userId,
       type: 'CREDIT',
       amount: Number(amount),
       description: 'Wallet top-up',
@@ -81,13 +81,13 @@ Deno.serve(async (req: Request) => {
   if (method === 'GET') {
     if (authResult.role === 'TECHNICIAN') {
       const { data: profile } = await adminDb.from('technician_profiles')
-        .select('wallet_balance').eq('user_id', authResult.userId).maybeSingle();
-      return ok({ balance: profile?.wallet_balance ?? 0 });
+        .select('walletBalance').eq('userId', authResult.userId).maybeSingle();
+      return ok({ balance: profile?.walletBalance ?? 0 });
     }
 
     // Customer: compute from transactions
     const { data: txns } = await adminDb.from('wallet_transactions')
-      .select('type, amount').eq('user_id', authResult.userId);
+      .select('type, amount').eq('userId', authResult.userId);
 
     const balance = (txns ?? []).reduce((acc: number, t: any) =>
       t.type === 'CREDIT' ? acc + t.amount : acc - t.amount, 0);

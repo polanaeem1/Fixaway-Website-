@@ -31,8 +31,8 @@ Deno.serve(async (req: Request) => {
     if (!lat || !lng) return err('lat and lng are required');
 
     const { data: profiles } = await adminDb.from('technician_profiles')
-      .select('*, users!inner(id, name, avatar_url)')
-      .eq('is_online', true).eq('is_verified', true)
+      .select('*, user:users!inner(id, name, avatarUrl)')
+      .eq('isOnline', true).eq('isVerified', true)
       .not('lat', 'is', null).not('lng', 'is', null);
 
     const nearby = (profiles ?? [])
@@ -49,8 +49,8 @@ Deno.serve(async (req: Request) => {
     if (authResult instanceof Response) return authResult;
 
     const { data } = await adminDb.from('technician_profiles')
-      .select('*, users!inner(id, name, email, avatar_url, created_at)')
-      .eq('is_verified', false).order('created_at', { ascending: false });
+      .select('*, user:users!inner(id, name, email, avatarUrl, createdAt)')
+      .eq('isVerified', false).order('createdAt', { ascending: false });
 
     return ok(data ?? []);
   }
@@ -62,8 +62,8 @@ Deno.serve(async (req: Request) => {
 
     const { isOnline, lat, lng } = await req.json();
     const { data: profile } = await adminDb.from('technician_profiles')
-      .update({ is_online: isOnline, lat, lng })
-      .eq('user_id', authResult.userId)
+      .update({ isOnline, lat, lng, updatedAt: new Date().toISOString() })
+      .eq('userId', authResult.userId)
       .select().single();
 
     return ok(profile, 'Status updated');
@@ -76,7 +76,7 @@ Deno.serve(async (req: Request) => {
 
     const techId = segments[segments.length - 2]; // /technicians/:id/verify
     const { data: profile } = await adminDb.from('technician_profiles')
-      .update({ is_verified: true }).eq('user_id', techId).select().single();
+      .update({ isVerified: true, updatedAt: new Date().toISOString() }).eq('userId', techId).select().single();
 
     return ok(profile, 'Technician verified');
   }
@@ -85,8 +85,8 @@ Deno.serve(async (req: Request) => {
   if (method === 'GET' && segments.length >= 1 && segments.at(-1) !== 'technicians') {
     const id = segments.at(-1)!;
     const { data } = await adminDb.from('technician_profiles')
-      .select('*, users!inner(id, name, avatar_url, email, phone)')
-      .eq('user_id', id).maybeSingle();
+      .select('*, user:users!inner(id, name, avatarUrl, email, phone)')
+      .eq('userId', id).maybeSingle();
     if (!data) return err('Technician not found', 404);
     return ok(data);
   }
@@ -101,11 +101,11 @@ Deno.serve(async (req: Request) => {
     const verified = q.get('verified');
 
     let query = adminDb.from('technician_profiles')
-      .select('*, users!inner(id, name, email, avatar_url)', { count: 'exact' });
-    if (verified !== null) query = query.eq('is_verified', verified === 'true');
+      .select('*, user:users!inner(id, name, email, avatarUrl)', { count: 'exact' });
+    if (verified !== null) query = query.eq('isVerified', verified === 'true');
 
     const { data, count } = await query
-      .order('created_at', { ascending: false })
+      .order('createdAt', { ascending: false })
       .range((page - 1) * limit, page * limit - 1);
 
     return ok({ technicians: data ?? [], total: count ?? 0, page, limit });

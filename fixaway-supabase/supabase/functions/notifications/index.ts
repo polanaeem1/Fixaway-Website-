@@ -16,9 +16,9 @@ Deno.serve(async (req: Request) => {
   // PATCH /notifications/read-all
   if (method === 'PATCH' && segments.at(-1) === 'read-all') {
     await adminDb.from('notifications')
-      .update({ is_read: true })
-      .eq('user_id', authResult.userId)
-      .eq('is_read', false);
+      .update({ isRead: true })
+      .eq('userId', authResult.userId)
+      .eq('isRead', false);
     return ok(null, 'All notifications marked as read');
   }
 
@@ -26,10 +26,10 @@ Deno.serve(async (req: Request) => {
   if (method === 'PATCH' && segments.at(-1) === 'read') {
     const id = segments[segments.length - 2];
     const { data: notif } = await adminDb.from('notifications')
-      .select('id, user_id').eq('id', id).maybeSingle();
+      .select('id, userId').eq('id', id).maybeSingle();
     if (!notif) return err('Notification not found', 404);
-    if (notif.user_id !== authResult.userId) return err('Unauthorized', 403);
-    await adminDb.from('notifications').update({ is_read: true }).eq('id', id);
+    if (notif.userId !== authResult.userId) return err('Unauthorized', 403);
+    await adminDb.from('notifications').update({ isRead: true }).eq('id', id);
     return ok(null, 'Marked as read');
   }
 
@@ -41,13 +41,13 @@ Deno.serve(async (req: Request) => {
     const [{ data: notifications, count }, { count: unreadCount }] = await Promise.all([
       adminDb.from('notifications')
         .select('*', { count: 'exact' })
-        .eq('user_id', authResult.userId)
-        .order('created_at', { ascending: false })
+        .eq('userId', authResult.userId)
+        .order('createdAt', { ascending: false })
         .range((page - 1) * limit, page * limit - 1),
       adminDb.from('notifications')
         .select('*', { count: 'exact', head: true })
-        .eq('user_id', authResult.userId)
-        .eq('is_read', false),
+        .eq('userId', authResult.userId)
+        .eq('isRead', false),
     ]);
 
     return ok({

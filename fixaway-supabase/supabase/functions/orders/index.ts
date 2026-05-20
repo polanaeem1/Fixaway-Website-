@@ -2,6 +2,22 @@ import { handleCors } from '../_shared/cors.ts';
 import { adminDb, ok, err, getPathSegments, getQuery, genId } from '../_shared/db.ts';
 import { requireAuth, requireRole } from '../_shared/auth.ts';
 
+function mapOrderRelations(order: any) {
+  if (!order) return;
+  if (order.serviceRequest) {
+    order.request = {
+      ...order.serviceRequest,
+      category: Array.isArray(order.serviceRequest.categories)
+        ? (order.serviceRequest.categories[0] || null)
+        : (order.serviceRequest.categories || null),
+    };
+  }
+  if (order.technician && order.technician.technician_profiles) {
+    order.technician.technicianProfile = order.technician.technician_profiles[0] || null;
+    delete order.technician.technician_profiles;
+  }
+}
+
 Deno.serve(async (req: Request) => {
   const cors = handleCors(req);
   if (cors) return cors;
@@ -21,15 +37,19 @@ Deno.serve(async (req: Request) => {
 
     let query = adminDb.from('orders').select(`
       *,
-      service_requests!request_id(*, categories(*)),
-      users!customer_id(id, name, email),
-      users!technician_id(id, name, email)
+      serviceRequest:service_requests!requestId(*, categories(*)),
+      customer:users!customerId(id, name, email),
+      technician:users!technicianId(id, name, email)
     `, { count: 'exact' });
     if (status) query = query.eq('status', status);
 
     const { data, count } = await query
-      .order('created_at', { ascending: false })
+      .order('createdAt', { ascending: false })
       .range((page - 1) * limit, page * limit - 1);
+
+    if (data) {
+      data.forEach(mapOrderRelations);
+    }
 
     return ok({ orders: data ?? [], total: count ?? 0 });
   }
@@ -45,59 +65,48 @@ Deno.serve(async (req: Request) => {
     if (!validStatuses.includes(status)) return err('Invalid status');
 
     const { data: order } = await adminDb.from('orders')
-      .select('id, customer_id, technician_id, request_id, total_amount, status')
+      .select('id, customerId, technicianId, requestId, totalAmount, status')
       .eq('id', id).maybeSingle();
     if (!order) return err('Order not found', 404);
 
-    const updateData: Record<string, unknown> = { status };
-    if (status === 'IN_PROGRESS') updateData.started_at = new Date().toISOString();
+    const updateData: Record<string, unknown> = { status, updatedAt: new Date().toISOString() };
+    if (status === 'IN_PROGRESS') updateData.startedAt = new Date().toISOString();
 
     if (status === 'COMPLETED') {
-      updateData.completed_at = new Date().toISOString();
+      updateData.completedAt = new Date().toISOString();
 
       // Update request status
-      await adminDb.from('service_requests').update({ status: 'COMPLETED' }).eq('id', order.request_id);
+      await adminDb.from('service_requests').update({ status: 'COMPLETED', updatedAt: new Date().toISOString() }).eq('id', order.requestId);
 
-      const techEarnings = order.total_amount * 0.85;
+      const techEarnings = order.totalAmount * 0.85;
 
-      // Credit technician wallet balance
-      await adminDb.from('technician_profiles')
-        .update({
-          wallet_balance: adminDb.rpc('increment_wallet', {
-            tech_id: order.technician_id,
-            amount: techEarnings,
-          }),
-          total_jobs: adminDb.rpc('increment_jobs', { tech_id: order.technician_id }),
-        })
-        .eq('user_id', order.technician_id);
-
-      // Simpler approach: raw RPC or direct update
+      // Direct update approach:
       const { data: techProfile } = await adminDb.from('technician_profiles')
-        .select('wallet_balance, total_jobs').eq('user_id', order.technician_id).single();
+        .select('walletBalance, totalJobs').eq('userId', order.technicianId).maybeSingle();
 
       if (techProfile) {
         await adminDb.from('technician_profiles').update({
-          wallet_balance: (techProfile.wallet_balance ?? 0) + techEarnings,
-          total_jobs: (techProfile.total_jobs ?? 0) + 1,
-        }).eq('user_id', order.technician_id);
+          walletBalance: (techProfile.walletBalance ?? 0) + techEarnings,
+          totalJobs: (techProfile.totalJobs ?? 0) + 1,
+        }).eq('userId', order.technicianId);
       }
 
       // Create wallet transactions
       await adminDb.from('wallet_transactions').insert([
         {
           id: genId(),
-          user_id: order.technician_id,
-          order_id: id,
+          userId: order.technicianId,
+          orderId: id,
           type: 'CREDIT',
           amount: techEarnings,
           description: `Earnings from order #${id.slice(-6)}`,
         },
         {
           id: genId(),
-          user_id: order.customer_id,
-          order_id: id,
+          userId: order.customerId,
+          orderId: id,
           type: 'DEBIT',
-          amount: order.total_amount,
+          amount: order.totalAmount,
           description: `Payment for order #${id.slice(-6)}`,
         },
       ]);
@@ -115,15 +124,18 @@ Deno.serve(async (req: Request) => {
     const id = segments.at(-1)!;
     const { data } = await adminDb.from('orders').select(`
       *,
-      service_requests!request_id(*, categories(*)),
-      users!customer_id(id, name, avatar_url, phone),
-      users!technician_id(id, name, avatar_url, phone, technician_profiles(*)),
-      quotations(*),
-      chat_messages(*, users!sender_id(id, name, avatar_url, role)),
+      serviceRequest:service_requests!requestId(*, categories(*)),
+      customer:users!customerId(id, name, avatarUrl, phone),
+      technician:users!technicianId(id, name, avatarUrl, phone, technician_profiles(*)),
+      quotation:quotations(*),
+      chatMessages:chat_messages(*, sender:users!senderId(id, name, avatarUrl, role)),
       reviews(*)
     `).eq('id', id).maybeSingle();
 
     if (!data) return err('Order not found', 404);
+
+    mapOrderRelations(data);
+
     return ok(data);
   }
 
@@ -138,19 +150,23 @@ Deno.serve(async (req: Request) => {
 
     let query = adminDb.from('orders').select(`
       *,
-      service_requests!request_id(*, categories(*)),
-      users!customer_id(id, name, avatar_url, phone),
-      users!technician_id(id, name, avatar_url, phone, technician_profiles(*)),
-      quotations(*)
+      serviceRequest:service_requests!requestId(*, categories(*)),
+      customer:users!customerId(id, name, avatarUrl, phone),
+      technician:users!technicianId(id, name, avatarUrl, phone, technician_profiles(*)),
+      quotation:quotations(*)
     `, { count: 'exact' });
 
-    if (authResult.role === 'CUSTOMER') query = query.eq('customer_id', authResult.userId);
-    if (authResult.role === 'TECHNICIAN') query = query.eq('technician_id', authResult.userId);
+    if (authResult.role === 'CUSTOMER') query = query.eq('customerId', authResult.userId);
+    if (authResult.role === 'TECHNICIAN') query = query.eq('technicianId', authResult.userId);
     if (status) query = query.eq('status', status);
 
     const { data, count } = await query
-      .order('created_at', { ascending: false })
+      .order('createdAt', { ascending: false })
       .range((page - 1) * limit, page * limit - 1);
+
+    if (data) {
+      data.forEach(mapOrderRelations);
+    }
 
     return ok({ orders: data ?? [], total: count ?? 0 });
   }

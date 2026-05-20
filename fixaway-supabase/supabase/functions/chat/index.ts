@@ -26,9 +26,9 @@ Deno.serve(async (req: Request) => {
   // ── GET messages ────────────────────────────────────────────────────────────
   if (method === 'GET') {
     const { data: messages } = await adminDb.from('chat_messages')
-      .select('*, users!sender_id(id, name, avatar_url, role)')
-      .eq('order_id', orderId)
-      .order('created_at', { ascending: true });
+      .select('*, sender:users!senderId(id, name, avatarUrl, role)')
+      .eq('orderId', orderId)
+      .order('createdAt', { ascending: true });
 
     return ok(messages ?? []);
   }
@@ -39,22 +39,22 @@ Deno.serve(async (req: Request) => {
     if (!reason) return err('Reason is required');
 
     const { data: order } = await adminDb.from('orders')
-      .select('id, customer_id, technician_id').eq('id', orderId).maybeSingle();
+      .select('id, customerId, technicianId').eq('id', orderId).maybeSingle();
     if (!order) return err('Order not found', 404);
 
     let finalDescription = `Reported by user (ID: ${authResult.userId}): ${reason}`;
 
     if (messageId) {
       const { data: msg } = await adminDb.from('chat_messages')
-        .select('content, media_url').eq('id', messageId).maybeSingle();
+        .select('content, mediaUrl').eq('id', messageId).maybeSingle();
       if (msg) {
-        finalDescription += `\nFlagged Message: "${msg.content}"${msg.media_url ? ` [Media: ${msg.media_url}]` : ''}`;
+        finalDescription += `\nFlagged Message: "${msg.content}"${msg.mediaUrl ? ` [Media: ${msg.mediaUrl}]` : ''}`;
       }
     }
 
     const { data: alert, error: alertErr } = await adminDb.from('fraud_alerts').insert({
       id: genId(),
-      order_id: orderId,
+      orderId: orderId,
       type: 'SUSPICIOUS_ACTIVITY',
       description: finalDescription,
     }).select().single();
@@ -69,20 +69,20 @@ Deno.serve(async (req: Request) => {
     if (!content && !mediaUrl) return err('Message content or media is required');
 
     const { data: order } = await adminDb.from('orders')
-      .select('id, customer_id, technician_id').eq('id', orderId).maybeSingle();
+      .select('id, customerId, technicianId').eq('id', orderId).maybeSingle();
     if (!order) return err('Order not found', 404);
 
     const isParticipant =
-      order.customer_id === authResult.userId || order.technician_id === authResult.userId;
+      order.customerId === authResult.userId || order.technicianId === authResult.userId;
     if (!isParticipant) return err('Not a participant in this order', 403);
 
     const { data: message, error: msgErr } = await adminDb.from('chat_messages').insert({
       id: genId(),
-      order_id: orderId,
-      sender_id: authResult.userId,
+      orderId: orderId,
+      senderId: authResult.userId,
       content: content ?? '',
-      media_url: mediaUrl ?? null,
-    }).select('*, users!sender_id(id, name, avatar_url, role)').single();
+      mediaUrl: mediaUrl ?? null,
+    }).select('*, sender:users!senderId(id, name, avatarUrl, role)').single();
 
     if (msgErr) return err(`Failed to send message: ${msgErr.message}`, 500);
 

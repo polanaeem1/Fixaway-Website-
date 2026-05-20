@@ -25,7 +25,7 @@ Deno.serve(async (req: Request) => {
     return err('Failed to parse form data', 400);
   }
 
-  const file = formData.get('file') as File | null;
+  const file = (formData.get('media') ?? formData.get('file')) as File | null;
   if (!file) return err('No file provided', 400);
 
   const allowedTypes = /^(image\/|audio\/|video\/)/;

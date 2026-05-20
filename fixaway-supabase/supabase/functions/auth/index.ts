@@ -31,13 +31,14 @@ Deno.serve(async (req: Request) => {
     const userId = genId();
 
     const { data: user, error: userErr } = await adminDb.from('users').insert({
-      id: userId, name, email, phone: phone || null, password_hash: passwordHash, role: userRole,
-    }).select('id, name, email, phone, role, created_at').single();
+      id: userId, name, email, phone: phone || null, passwordHash: passwordHash, role: userRole,
+      updatedAt: new Date().toISOString()
+    }).select('id, name, email, phone, role, createdAt').single();
 
     if (userErr) return err(`Failed to create user: ${userErr.message}`, 500);
 
     if (userRole === 'TECHNICIAN') {
-      await adminDb.from('technician_profiles').insert({ id: genId(), user_id: userId });
+      await adminDb.from('technician_profiles').insert({ id: genId(), userId: userId });
     }
 
     const tokenPayload = { userId: user.id, role: user.role, email: user.email };
@@ -53,19 +54,19 @@ Deno.serve(async (req: Request) => {
     if (!email || !password) return err('Email and password are required');
 
     const { data: user } = await adminDb.from('users')
-      .select('id, name, email, phone, role, avatar_url, is_active, password_hash, created_at')
+      .select('id, name, email, phone, role, avatarUrl, isActive, passwordHash, createdAt')
       .eq('email', email).maybeSingle();
 
-    if (!user || !user.is_active) return err('Invalid credentials', 401);
+    if (!user || !user.isActive) return err('Invalid credentials', 401);
 
-    const valid = await bcrypt.compare(password, user.password_hash);
+    const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) return err('Invalid credentials', 401);
 
     const tokenPayload = { userId: user.id, role: user.role, email: user.email };
     const accessToken = await signAccessToken(tokenPayload);
     const refreshToken = await signRefreshToken(tokenPayload);
 
-    const { password_hash: _, ...userWithoutPassword } = user;
+    const { passwordHash: _, ...userWithoutPassword } = user;
     return ok({ user: userWithoutPassword, accessToken, refreshToken }, 'Login successful');
   }
 
@@ -91,10 +92,16 @@ Deno.serve(async (req: Request) => {
     if (authResult instanceof Response) return authResult;
 
     const { data: user } = await adminDb.from('users')
-      .select('id, name, email, phone, role, avatar_url, created_at, technician_profiles(*)')
+      .select('id, name, email, phone, role, avatarUrl, createdAt, technician_profiles(*)')
       .eq('id', authResult.userId).maybeSingle();
 
     if (!user) return err('User not found', 404);
+
+    if (user.technician_profiles) {
+      user.technicianProfile = user.technician_profiles[0] || null;
+      delete user.technician_profiles;
+    }
+
     return ok(user);
   }
 
@@ -109,12 +116,12 @@ Deno.serve(async (req: Request) => {
     const updateData: Record<string, unknown> = {};
     if (name) updateData.name = name;
     if (phone !== undefined) updateData.phone = phone || null;
-    if (avatarUrl !== undefined) updateData.avatar_url = avatarUrl || null;
-    if (password) updateData.password_hash = await bcrypt.hash(password, 12);
+    if (avatarUrl !== undefined) updateData.avatarUrl = avatarUrl || null;
+    if (password) updateData.passwordHash = await bcrypt.hash(password, 12);
 
     const { data: user, error: updateErr } = await adminDb.from('users')
       .update(updateData).eq('id', authResult.userId)
-      .select('id, name, email, phone, role, avatar_url').single();
+      .select('id, name, email, phone, role, avatarUrl').single();
 
     if (updateErr) return err('Failed to update profile', 500);
 
@@ -122,7 +129,7 @@ Deno.serve(async (req: Request) => {
       const techUpdate: Record<string, unknown> = {};
       if (bio !== undefined) techUpdate.bio = bio;
       if (specialties !== undefined) techUpdate.specialties = specialties;
-      await adminDb.from('technician_profiles').update(techUpdate).eq('user_id', authResult.userId);
+      await adminDb.from('technician_profiles').update(techUpdate).eq('userId', authResult.userId);
     }
 
     return ok(user, 'Profile updated successfully');
